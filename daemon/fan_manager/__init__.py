@@ -1,0 +1,84 @@
+import time
+from threading import Thread
+
+from psutil import sensors_temperatures
+
+
+def fan_controller_factory(**kwargs):
+    args = dict(kwargs)
+    _type = args.pop('type')
+    if _type == 'locked_speed':
+        return LockedSpeedController(**args)
+    elif _type == 'temp_target':
+        return TempTargetController(**args)
+
+
+class FanController:
+    def main(self):
+        """
+        returns an integer between 0 and 100 to set the fan speed too
+        """
+        raise NotImplementedError
+
+
+class TempTargetController(FanController):
+    def __init__(self, target, sensor_name, multiplier: int=5):
+        self.sensor_name = sensor_name
+        self.target = float(target)
+        self.multiplier = multiplier
+        self.last_speed = 10
+
+    def main(self):
+        print()
+        print(self.target)
+        print(self._get_temp())
+        return (((self._get_temp() - self.target) * self.multiplier) + self.last_speed) /2
+
+    def _get_temp(self):
+        return sensors_temperatures().get(self.sensor_name)[0].current
+
+
+class LockedSpeedController(FanController):
+    def __init__(self, speed):
+        self.speed = speed
+
+    def main(self):
+        return self.speed
+
+
+class FanManager:
+    def __init__(self, initial_controller: FanController=None):
+        self._continue = False
+        self._thread = Thread(target=self._main_loop)
+        self._devices = []
+        self._controller = initial_controller
+
+    def attach_device(self, device):
+        self._devices.append(device)
+
+    def set_controller(self, controller):
+        if isinstance(controller, FanController):
+            self._controller = controller
+
+    def _main_loop(self):
+        while self._continue:
+            speed = self._controller.main()
+            print(speed)
+            if speed < 10:
+                speed = 10
+            elif speed > 100:
+                speed = 100
+
+            for dev in self._devices:
+                dev.set_fan_speed(speed)
+            time.sleep(5)
+
+    def start(self):
+        self._continue = True
+        if self._controller is None:
+            self._controller = TempTargetController(36, 'k10temp')
+        self._thread.start()
+
+    def stop(self):
+        self._continue = False
+        self._thread.join()
