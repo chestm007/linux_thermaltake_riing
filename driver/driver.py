@@ -26,7 +26,7 @@ class ThermaltakeRiingPlusDriver:
 
     def __init__(self):
         self.vendor_id = self.VENDOR_ID
-        self.product_id = self.PRODUCT_IDls
+        self.product_id = self.PRODUCT_ID
 
         self._initialize_device()
 
