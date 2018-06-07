@@ -10,6 +10,20 @@ If your's isnt listed, please create an issue!
 current installation is cloning the directory and pip installing that way.
  - in the very near future this will be uploaded to pypi
 
+In order for the dbus daemon to function properly, you will need to setup udev rule to
+allow your user to claim the usb device without being root. this is most easily done via
+a udev rule:
+
+```
+# this is specific to the usb controller I have - your mileage may vary.
+# /etc/udev/rules.d/90-thermaltake.rules
+ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="264a", ATTRS{idProduct}=="1fa5", MODE="660", GROUP="plugdev"
+```
+
+then add your user to the `plugdev` group - `sudo usermod -a -G plugdev <user>`
+
+then reconnect your device and you should be able to claim it without using sudo.
+
 ## Configuration
 create `/etc/thermaltake_riing/daemon_config.yaml` and configure suitably.
 

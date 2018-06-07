@@ -1,0 +1,24 @@
+FANS:
+ - cpu temp dependant [x]
+ - static speed [x]
+ - individual fan control [_]
+
+LIGHTING:
+ WINDOWS APP FUNCTIONALITY:
+  - individual component control [_]
+  - brightness control [x]
+  - light speed [_]
+  LIGHT MODE:
+   - wave [x] (spinning_rgb_spectrum)
+   - full lighted (single [x] (static) / rgb [x] (rgb spectrum))
+   - copy colour [_]
+   - sound control_1/_2/_3 [_]
+   - thermal [x]
+   - cross (single [_] / rgb [_])
+   - shooting star (single [_] / rgb [_])
+   - black hole (single [_] / rgb [_])
+   - aurora [_]
+
+ NEW FUNCTIONALITY:
+  LIGHT MODE:
+   - alternating colour [x] (alternating)

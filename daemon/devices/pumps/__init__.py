@@ -22,5 +22,5 @@ from daemon.devices import ThermaltakeRGBDevice
 
 
 class ThermaltakeRiingPlusFloeRGB(ThermaltakeRGBDevice):
-    num_leds = 6
-    index_per_led = 6
+    num_leds = 12
+    index_per_led = 3

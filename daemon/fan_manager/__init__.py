@@ -23,13 +23,11 @@ from threading import Thread
 from psutil import sensors_temperatures
 
 
-def fan_controller_factory(**kwargs):
-    args = dict(kwargs)
-    _type = args.pop('type')
-    if _type == 'locked_speed':
-        return LockedSpeedController(**args)
-    elif _type == 'temp_target':
-        return TempTargetController(**args)
+def fan_controller_factory(type=None, *args, **kwargs):
+    if type == 'locked_speed':
+        return LockedSpeedController(*args, **kwargs)
+    elif type == 'temp_target':
+        return TempTargetController(*args, **kwargs)
 
 
 class FanController:
@@ -48,9 +46,6 @@ class TempTargetController(FanController):
         self.last_speed = 10
 
     def main(self):
-        print()
-        print(self.target)
-        print(self._get_temp())
         return (((self._get_temp() - self.target) * self.multiplier) + self.last_speed) /2
 
     def _get_temp(self):
@@ -75,14 +70,13 @@ class FanManager:
     def attach_device(self, device):
         self._devices.append(device)
 
-    def set_controller(self, controller):
+    def set_controller(self, controller: FanController):
         if isinstance(controller, FanController):
             self._controller = controller
 
     def _main_loop(self):
         while self._continue:
             speed = self._controller.main()
-            print(speed)
             if speed < 10:
                 speed = 10
             elif speed > 100:
@@ -94,8 +88,6 @@ class FanManager:
 
     def start(self):
         self._continue = True
-        if self._controller is None:
-            self._controller = TempTargetController(36, 'k10temp')
         self._thread.start()
 
     def stop(self):

@@ -15,7 +15,8 @@ setup(
     author_email='chestm007@hotmail.com',
     description='python driver and daemon for thermaltake hardware products',
     install_requires=[
-        "pyyaml"
+        "pyyaml",
+        "gobject"
     ],
     entry_points="""
         [console_scripts]

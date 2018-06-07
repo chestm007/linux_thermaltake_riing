@@ -86,7 +86,10 @@ class ThermaltakeRiingPlusDriver:
         return array
 
     def write_out(self, data: list, length: int=64) -> None:
-        self.endpoint_out.write(self._populate_partial_data_array(data, length))
+        try:
+            self.endpoint_out.write(self._populate_partial_data_array(data, length))
+        except OverflowError:
+            return
 
     def read_out(self, length: int=64) -> bytearray:
         return self.endpoint_out.read(length)

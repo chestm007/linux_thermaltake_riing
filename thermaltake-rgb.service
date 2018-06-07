@@ -1,0 +1,12 @@
+[Unit]
+AssertPathExists=/etc/thermaltake_riing/daemon_config.yml
+
+[Service]
+WorkingDirectory=~
+ExecStart=/usr/bin/linux-thermaltake-rgb
+Restart=always
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
