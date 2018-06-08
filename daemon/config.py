@@ -23,12 +23,14 @@ import yaml
 
 
 class Config:
+    config_dir = '/etc/linux_thermaltake_rgb'
+    config_file_name = 'config.yml'
 
     def __init__(self):
-        if not os.path.isdir('/etc/thermaltake_riing'):
-            os.mkdir('/etc/thermaltake_riing')
+        if not os.path.isdir(self.config_dir):
+            os.mkdir(self.config_dir)
 
-        with open('/etc/thermaltake_riing/daemon_config.yml') as cfg:
+        with open('{}/{}'.format(self.config_dir, self.config_file_name)) as cfg:
             config = yaml.load(cfg)
             self.devices = config.get('devices')
             self.fan_controller = config.get('fan_controller')

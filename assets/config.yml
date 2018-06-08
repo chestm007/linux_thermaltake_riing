@@ -1,0 +1,16 @@
+devices:
+  1: Riing Plus
+  2: Riing Plus
+  3: Riing Plus
+  4: Riing Plus
+  5: Floe Riing RGB
+fan_controller:
+  type: temp_target
+  target: 38
+  sensor_name: k10temp
+  multiplier: 5
+lighting_controller:
+  type: static
+  r: 50
+  g: 0
+  b: 0

@@ -16,7 +16,7 @@ a udev rule:
 
 ```
 # this is specific to the usb controller I have - your mileage may vary.
-# /etc/udev/rules.d/90-thermaltake.rules
+# /etc/udev/rules.d/90linux-thermaltake-rgb.rules
 ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="264a", ATTRS{idProduct}=="1fa5", MODE="660", GROUP="plugdev"
 ```
 
@@ -25,7 +25,7 @@ then add your user to the `plugdev` group - `sudo usermod -a -G plugdev <user>`
 then reconnect your device and you should be able to claim it without using sudo.
 
 ## Configuration
-create `/etc/thermaltake_riing/daemon_config.yaml` and configure suitably.
+create `/etc/linux_thermaltake_rgb/config.yaml` and configure suitably.
 
 example config:
 

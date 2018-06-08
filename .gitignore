@@ -1,0 +1,6 @@
+**/*__pycache__
+**/*.egg-info
+**/*.h
+**/*.c
+Makefile
+CMakeLists.txt

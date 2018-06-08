@@ -2,7 +2,7 @@
 AssertPathExists=/etc/thermaltake_riing/daemon_config.yml
 
 [Service]
-WorkingDirectory=~
+WorkingDirectory=/
 ExecStart=/usr/bin/linux-thermaltake-rgb
 Restart=always
 PrivateTmp=true

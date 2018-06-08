@@ -163,7 +163,7 @@ class LightingController:
         self.lighting_effect.begin_dev()
         for i in range(device.num_leds):
             data.extend(self._brightness_processor(self.lighting_effect.next()))
-        return data, 1000
+        return data, 100
 
     def _brightness_processor(self, rgb):
         data = [int(i/100*self.brightness_level) for i in rgb]
