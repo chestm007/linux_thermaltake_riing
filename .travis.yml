@@ -1,0 +1,18 @@
+os: linux
+dist: trusty
+group: stable
+language: python
+python:
+  - '3.6'
+install:
+  - pip install
+script:
+  - echo "todo"
+deploy:
+  provider: pypi
+  user: "chestm007"
+  password:
+    secure: "n7adHupi7Ii0YNqRDXXxycMMUMKt5sLPhNAoiQTk8Lv6Vq3ywsclDaJyAgOaGv2jKULJt3TzJMrBioB40L4LXJSmHcFOpgxyOQ/x6qEmD6uKZNDYbCuY9lNhm9Bg+8UMfxjWhVI3z+NeIB7EHBlZdTlJaOErsY1ki4rWlLMyke0C69JMvup6rZSMKdZft8CDVCpexcBvXUkwxRE2v/Ovy/kbpIOeqHMG0XKmQL+Ah7XvZMVuvRF51LpAZqJgjdWF4A34Qnxi8yy6EzlYdlWe2FTflurAuJk/IuJU5+fWkPHf7jNAklqec8Gm6jIjYplku151tIGdgk/TH5AalhzVfg14B1r5otLFToGvFPnmq5sn3Ud0bQokAcyU7d96Hb718eU16vlNdgRzTbJcI4vCTV/cM4z0L3P3anJ0CBFGXoAQL6Tmehdsm9JQSuhSC0/oepBEaHLYLXhm5m9HtDPvCz3aDPbBFpbyM7hb3p2+kx0evKXWCwxcnbKzcoIvrLf303d4mBqD1LmMHHT2X3WsStTVmfHJrEXlr/Xq65JIsFE52af/1JEiLjE6xTt/8wemQyESgD6BOpBDtATHX8MSElxtviQp5IjWobYfinw3qFH4WUdH2JuRAzYoSgfZZ+29lcn/daKLoU+G+p60NN02avgKfiW9orKMIIkq5Gvz00w="
+  on:
+    branch: master
+    tags: true
