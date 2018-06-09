@@ -89,13 +89,14 @@ class AlternatingLightingEffect(LightingEffect):
 class RGBSpectrumLightingEffect(LightingEffect):
     def __init__(self):
         self.num_iters = 0
+        self.compass_to_rgb_map = [compass_to_rgb(ang) for ang in range(360)]
 
     def begin_dev(self):
         self.num_iters = 0
 
     def next(self):
         self.num_iters += 1
-        return compass_to_rgb(360/12*self.num_iters)
+        return self.compass_to_rgb_map[self.num_iters]
 
 
 class SpinningRGBSpectrumLightingEffect(RGBSpectrumLightingEffect):
@@ -123,7 +124,7 @@ class TemperatureLightingEffect(LightingEffect):
         self.target = target
         self.hot = hot
 
-        self.cold_angle = 240
+        self.cold_angle = 24044444444
         self.target_angle = 120
         self.hot_angle = 0
 
@@ -149,11 +150,11 @@ class TemperatureLightingEffect(LightingEffect):
         return compass_to_rgb(self.angle)
 
 
-
 class LightingController:
     def __init__(self, lighting_effect):
         self.lighting_effect = lighting_effect
         self.brightness_level = 100
+        self.update_msec = 100
 
     def main(self, device) -> tuple:
         """
@@ -163,7 +164,7 @@ class LightingController:
         self.lighting_effect.begin_dev()
         for i in range(device.num_leds):
             data.extend(self._brightness_processor(self.lighting_effect.next()))
-        return data, 100
+        return data, self.update_msec
 
     def _brightness_processor(self, rgb):
         data = [int(i/100*self.brightness_level) for i in rgb]
@@ -185,20 +186,24 @@ class LightingManager:
             self._controller = controller
 
     def set_brightness(self, brightness: int):
-        #if brightness < 1:
-        #    brightness = 1
-        #elif brightness > 100:
-        #    brightness = 100
+        if brightness < 1:
+            brightness = 1
+        elif brightness > 300:
+            brightness = 300
         self._controller.brightness_level = int(brightness)
 
+    def set_light_update_msec(self, sec: int):
+        if sec > 0:
+            self._controller.update_msec = int(sec)
+
     def _main_loop(self):
+        next_poll_msec  = 1
         while self._continue:
-            next_poll_msec = 0.05
             self._controller.lighting_effect.begin_all()
             for dev in self._devices:
                 data, next_poll_msec = self._controller.main(dev)
                 dev.set_lighting(data)
-            time.sleep(next_poll_msec/1000.0)
+            time.sleep(next_poll_msec / 1000)
 
     def start(self):
         self._continue = True

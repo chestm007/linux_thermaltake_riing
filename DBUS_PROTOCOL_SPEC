@@ -18,3 +18,6 @@
 
 # set brightness (multiplier of existing lighting controller 0-100) [brightness_multiplier: 0-100]
 --type=method_call --dest=org.thermaltake.Daemon /org/thermaltake/Daemon org.thermaltake.Daemon.set_lighting_brightness int16:50
+
+# set lighting refresh rate (high rates will cause higher cpu usage)
+--type=method_call --dest=org.thermaltake.Daemon /org/thermaltake/Daemon org.thermaltake.Daemon.set_lighting_msec int16:1

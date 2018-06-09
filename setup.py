@@ -27,9 +27,9 @@ setup(
     ],
     entry_points="""
         [console_scripts]
-        linux-thermaltake-rgb=main:main
+        linux-thermaltake-rgb=daemon.main:main
     """,
     data_files=[('/etc/udev/rules.d', ['assets/90-linux_thermaltake_rgb.rules']),
-                ('/etc/systemd/system', ['assets/linux-thermaltake-rgb.service']),
+                ('/usr/lib/systemd/user', ['assets/linux-thermaltake-rgb.service']),
                 ('/etc/linux_thermaltake_rgb', ['assets/config.yml'])]
 )

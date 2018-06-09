@@ -51,6 +51,12 @@ class ThermaltakeDbusService(dbus.service.Object):
             self.daemon.lighting_manager.set_brightness(args[0])
             return "success"
 
+    @dbus.service.method(dbus_interface=IFACE, in_signature="", out_signature="s")
+    def set_lighting_msec(self, *args):
+        if len(args) > 0:
+            self.daemon.lighting_manager.set_light_update_msec(args[0])
+            return "success"
+
     def start(self):
         self.thread = Thread(target=self._main_loop)
         self.thread.start()
