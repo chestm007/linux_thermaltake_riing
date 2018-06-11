@@ -167,8 +167,10 @@ class LightingController:
         return data, self.update_msec
 
     def _brightness_processor(self, rgb):
-        data = [int(i/100*self.brightness_level) for i in rgb]
-        return data
+        if self.brightness_level == 0:
+            return [0, 0, 0]
+        else:
+            return [int(i/100*self.brightness_level) for i in rgb]
 
 
 class LightingManager:
@@ -186,8 +188,8 @@ class LightingManager:
             self._controller = controller
 
     def set_brightness(self, brightness: int):
-        if brightness < 1:
-            brightness = 1
+        if brightness < 0:
+            brightness = 0
         elif brightness > 300:
             brightness = 300
         self._controller.brightness_level = int(brightness)
