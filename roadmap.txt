@@ -7,7 +7,7 @@ LIGHTING:
  WINDOWS APP FUNCTIONALITY:
   - individual component control [_]
   - brightness control [x]
-  - light speed [_]
+  - light speed [x]
   LIGHT MODE:
    - wave [x] (spinning_rgb_spectrum)
    - full lighted (single [x] (static) / rgb [x] (rgb spectrum))
@@ -22,3 +22,4 @@ LIGHTING:
  NEW FUNCTIONALITY:
   LIGHT MODE:
    - alternating colour [x] (alternating)
+   - pulsating [_]

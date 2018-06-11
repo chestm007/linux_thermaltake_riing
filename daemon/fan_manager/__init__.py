@@ -77,8 +77,8 @@ class FanManager:
     def _main_loop(self):
         while self._continue:
             speed = self._controller.main()
-            if speed < 10:
-                speed = 10
+            if speed < 0:
+                speed = 0
             elif speed > 100:
                 speed = 100
 

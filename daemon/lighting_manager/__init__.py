@@ -96,7 +96,7 @@ class RGBSpectrumLightingEffect(LightingEffect):
 
     def next(self):
         self.num_iters += 1
-        return self.compass_to_rgb_map[self.num_iters]
+        return self.compass_to_rgb_map[int(360/12*self.num_iters)]
 
 
 class SpinningRGBSpectrumLightingEffect(RGBSpectrumLightingEffect):
@@ -124,7 +124,7 @@ class TemperatureLightingEffect(LightingEffect):
         self.target = target
         self.hot = hot
 
-        self.cold_angle = 24044444444
+        self.cold_angle = 240
         self.target_angle = 120
         self.hot_angle = 0
 
