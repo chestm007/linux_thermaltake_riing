@@ -22,6 +22,8 @@ from threading import Thread
 
 from psutil import sensors_temperatures
 
+from linux_thermaltake_rgb import LOGGER
+
 
 def fan_controller_factory(type=None, *args, **kwargs):
     if type == 'locked_speed':
@@ -46,10 +48,16 @@ class TempTargetController(FanController):
         self.last_speed = 10
 
     def main(self):
-        return (((self._get_temp() - self.target) * self.multiplier) + self.last_speed) / 2
+        temp = self._get_temp()
+        speed = (((temp - self.target) * self.multiplier) + self.last_speed) / 2
+        LOGGER.debug(f'Temperature is {temp}°C, setting fan speed to {speed}%')
+        return speed
 
     def _get_temp(self):
         return sensors_temperatures().get(self.sensor_name)[0].current
+
+    def __str__(self) -> str:
+        return f'target {self.target}°C on sensor {self.sensor_name}'
 
 
 class LockedSpeedController(FanController):
@@ -57,7 +65,11 @@ class LockedSpeedController(FanController):
         self.speed = speed
 
     def main(self):
+        LOGGER.debug(f'Setting fan speed to {self.speed}%')
         return self.speed
+
+    def __str__(self) -> str:
+        return f'locked speed {self.speed}%'
 
 
 class FanManager:
@@ -87,9 +99,11 @@ class FanManager:
             time.sleep(5)
 
     def start(self):
+        LOGGER.info(f'Starting fan manager ({self._controller})...')
         self._continue = True
         self._thread.start()
 
     def stop(self):
+        LOGGER.info(f'Stopping fan manager...')
         self._continue = False
         self._thread.join()

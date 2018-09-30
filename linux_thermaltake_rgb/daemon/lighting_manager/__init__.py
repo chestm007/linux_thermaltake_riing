@@ -22,6 +22,7 @@ from threading import Thread
 
 from psutil import sensors_temperatures
 
+from linux_thermaltake_rgb import LOGGER
 from linux_thermaltake_rgb.daemon.lighting_manager.utils.colours import compass_to_rgb
 
 
@@ -70,6 +71,9 @@ class StaticLightingEffect(LightingEffect):
     def next(self):
         return self.g, self.r, self.b
 
+    def __str__(self) -> str:
+        return f'static lighting {self.r},{self.b},{self.b}'
+
 
 class AlternatingLightingEffect(LightingEffect):
     def __init__(self, even_rgb_matrix, odd_rgb_matrix):
@@ -85,6 +89,11 @@ class AlternatingLightingEffect(LightingEffect):
             self.odd = True
             return self.even_g, self.even_r, self.even_b
 
+    def __str__(self) -> str:
+        return f'alternating lighting ' \
+               f'{self.even_r},{self.even_b},{self.even_b} / ' \
+               f'{self.odd_r},{self.odd_b},{self.odd_b}'
+
 
 class RGBSpectrumLightingEffect(LightingEffect):
     def __init__(self):
@@ -97,6 +106,9 @@ class RGBSpectrumLightingEffect(LightingEffect):
     def next(self):
         self.num_iters += 1
         return self.compass_to_rgb_map[int(360 / 12 * self.num_iters)]
+
+    def __str__(self) -> str:
+        return f'RGB spectrum'
 
 
 class SpinningRGBSpectrumLightingEffect(RGBSpectrumLightingEffect):
@@ -112,6 +124,9 @@ class SpinningRGBSpectrumLightingEffect(RGBSpectrumLightingEffect):
     def next(self):
         self.num_iters += 1
         return compass_to_rgb((360 / 12 * self.num_iters) + 360 / 12 * self.rotation)
+
+    def __str__(self) -> str:
+        return f'spinning RGB spectrum'
 
 
 class TemperatureLightingEffect(LightingEffect):
@@ -149,6 +164,9 @@ class TemperatureLightingEffect(LightingEffect):
     def next(self):
         return compass_to_rgb(self.angle)
 
+    def __str__(self) -> str:
+        return f'temperature lighting'
+
 
 class LightingController:
     def __init__(self, lighting_effect):
@@ -171,6 +189,9 @@ class LightingController:
             return [0, 0, 0]
         else:
             return [int(i / 100 * self.brightness_level) for i in rgb]
+
+    def __str__(self) -> str:
+        return str(self.lighting_effect)
 
 
 class LightingManager:
@@ -208,9 +229,11 @@ class LightingManager:
             time.sleep(next_poll_msec / 1000)
 
     def start(self):
+        LOGGER.info(f'Starting lighting manager ({self._controller})...')
         self._continue = True
         self._thread.start()
 
     def stop(self):
+        LOGGER.info(f'Stopping lighting manager...')
         self._continue = False
         self._thread.join()
