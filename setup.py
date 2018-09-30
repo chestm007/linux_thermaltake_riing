@@ -23,7 +23,10 @@ setup(
     long_description=readme,
     install_requires=[
         "pyyaml",
-        "gobject"
+        "PyGObject",
+        "dbus-python",
+        "psutil",
+        "pyusb"
     ],
     entry_points="""
         [console_scripts]
