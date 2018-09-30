@@ -50,6 +50,12 @@ class TempTargetController(FanController):
     def main(self):
         temp = self._get_temp()
         speed = (((temp - self.target) * self.multiplier) + self.last_speed) / 2
+
+        if speed < 0:
+            speed = 0
+        elif speed > 100:
+            speed = 100
+
         LOGGER.debug(f'Temperature is {temp}°C, setting fan speed to {speed}%')
         return speed
 
@@ -62,6 +68,8 @@ class TempTargetController(FanController):
 
 class LockedSpeedController(FanController):
     def __init__(self, speed):
+        if not 0 <= speed <= 100:
+            raise ValueError(f'Speed must be between 0 and 100, got {speed}')
         self.speed = speed
 
     def main(self):
@@ -89,11 +97,6 @@ class FanManager:
     def _main_loop(self):
         while self._continue:
             speed = self._controller.main()
-            if speed < 0:
-                speed = 0
-            elif speed > 100:
-                speed = 100
-
             for dev in self._devices:
                 dev.set_fan_speed(speed)
             time.sleep(5)
