@@ -22,7 +22,7 @@ from threading import Thread
 
 from psutil import sensors_temperatures
 
-from daemon.lighting_manager.utils.colours import compass_to_rgb
+from linux_thermaltake_rgb.daemon.lighting_manager.utils.colours import compass_to_rgb
 
 
 def lighting_controller_factory(*args, **kwargs):
@@ -96,7 +96,7 @@ class RGBSpectrumLightingEffect(LightingEffect):
 
     def next(self):
         self.num_iters += 1
-        return self.compass_to_rgb_map[int(360/12*self.num_iters)]
+        return self.compass_to_rgb_map[int(360 / 12 * self.num_iters)]
 
 
 class SpinningRGBSpectrumLightingEffect(RGBSpectrumLightingEffect):
@@ -111,11 +111,11 @@ class SpinningRGBSpectrumLightingEffect(RGBSpectrumLightingEffect):
 
     def next(self):
         self.num_iters += 1
-        return compass_to_rgb((360/12*self.num_iters) + 360/12*self.rotation)
+        return compass_to_rgb((360 / 12 * self.num_iters) + 360 / 12 * self.rotation)
 
 
 class TemperatureLightingEffect(LightingEffect):
-    def __init__(self, sensor_name, hot: int=60, target: int=30, cold: int=20):
+    def __init__(self, sensor_name, hot: int = 60, target: int = 30, cold: int = 20):
         self.sensor_name = sensor_name
         self.cur_temp = 0
         self.angle = 0
@@ -170,11 +170,11 @@ class LightingController:
         if self.brightness_level == 0:
             return [0, 0, 0]
         else:
-            return [int(i/100*self.brightness_level) for i in rgb]
+            return [int(i / 100 * self.brightness_level) for i in rgb]
 
 
 class LightingManager:
-    def __init__(self, initial_controller: LightingController=None):
+    def __init__(self, initial_controller: LightingController = None):
         self._continue = False
         self._thread = Thread(target=self._main_loop)
         self._devices = []
@@ -199,7 +199,7 @@ class LightingManager:
             self._controller.update_msec = int(sec)
 
     def _main_loop(self):
-        next_poll_msec  = 1
+        next_poll_msec = 1
         while self._continue:
             self._controller.lighting_effect.begin_all()
             for dev in self._devices:

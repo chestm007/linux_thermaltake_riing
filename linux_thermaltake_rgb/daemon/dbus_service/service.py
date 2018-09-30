@@ -6,8 +6,8 @@ from gi.repository import GObject
 
 from dbus.mainloop.glib import DBusGMainLoop
 
-from daemon.fan_manager import fan_controller_factory
-from daemon.lighting_manager import lighting_controller_factory
+from linux_thermaltake_rgb.daemon.fan_manager import fan_controller_factory
+from linux_thermaltake_rgb.daemon.lighting_manager import lighting_controller_factory
 
 DBusGMainLoop(set_as_default=True)
 
