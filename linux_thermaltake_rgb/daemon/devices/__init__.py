@@ -52,5 +52,3 @@ class ThermaltakeFanDevice(ThermaltakeDevice):
         data = [PROTOCOL_GET, PROTOCOL_FAN, self.id]
         self.driver.write_out(data)
         self.driver.read_in()
-
-

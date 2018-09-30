@@ -39,14 +39,14 @@ class FanController:
 
 
 class TempTargetController(FanController):
-    def __init__(self, target, sensor_name, multiplier: int=5):
+    def __init__(self, target, sensor_name, multiplier: int = 5):
         self.sensor_name = sensor_name
         self.target = float(target)
         self.multiplier = multiplier
         self.last_speed = 10
 
     def main(self):
-        return (((self._get_temp() - self.target) * self.multiplier) + self.last_speed) /2
+        return (((self._get_temp() - self.target) * self.multiplier) + self.last_speed) / 2
 
     def _get_temp(self):
         return sensors_temperatures().get(self.sensor_name)[0].current
@@ -61,7 +61,7 @@ class LockedSpeedController(FanController):
 
 
 class FanManager:
-    def __init__(self, initial_controller: FanController=None):
+    def __init__(self, initial_controller: FanController = None):
         self._continue = False
         self._thread = Thread(target=self._main_loop)
         self._devices = []

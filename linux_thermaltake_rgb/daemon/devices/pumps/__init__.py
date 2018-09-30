@@ -1,4 +1,3 @@
-
 """
 linux_thermaltake_rgb
 Software to control your thermaltake hardware

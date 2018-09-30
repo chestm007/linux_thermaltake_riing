@@ -68,7 +68,7 @@ class ThermaltakeRiingPlusDriver:
         assert self.endpoint_in is not None
 
     @staticmethod
-    def _generate_data_array(length: int=64, value: int=0x00) -> list:
+    def _generate_data_array(length: int = 64, value: int = 0x00) -> list:
         """
         helper function to generate a zeroed out array of length size
         """
@@ -85,19 +85,17 @@ class ThermaltakeRiingPlusDriver:
         )
         return array
 
-    def write_out(self, data: list, length: int=64) -> None:
+    def write_out(self, data: list, length: int = 64) -> None:
         try:
             self.endpoint_out.write(self._populate_partial_data_array(data, length))
         except OverflowError:
             return
 
-    def read_out(self, length: int=64) -> bytearray:
+    def read_out(self, length: int = 64) -> bytearray:
         return self.endpoint_out.read(length)
 
-    def write_in(self, data: list, length: int=64) -> None:
+    def write_in(self, data: list, length: int = 64) -> None:
         self.endpoint_in.write(self._populate_partial_data_array(data, length))
 
-    def read_in(self, length: int=64) -> bytearray:
+    def read_in(self, length: int = 64) -> bytearray:
         return self.endpoint_in.read(length)
-
-

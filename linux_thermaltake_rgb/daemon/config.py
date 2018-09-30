@@ -35,4 +35,3 @@ class Config:
             self.devices = config.get('devices')
             self.fan_controller = config.get('fan_controller')
             self.lighting_controller = config.get('lighting_controller')
-

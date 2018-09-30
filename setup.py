@@ -1,6 +1,6 @@
+import os
 import time
 from distutils.core import setup
-import os
 
 from setuptools import find_packages
 
