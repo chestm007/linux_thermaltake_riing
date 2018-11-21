@@ -67,6 +67,8 @@ class ThermaltakeRiingPlusDriver:
             custom_match=lambda e: usb.util.endpoint_direction(e.bEndpointAddress) == usb.util.ENDPOINT_IN)
         assert self.endpoint_in is not None
 
+        self.write_out([0xfe, 0x33])
+
     @staticmethod
     def _generate_data_array(length: int=64, value: int=0x00) -> list:
         """
