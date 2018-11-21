@@ -4,3 +4,5 @@
 **/*.c
 Makefile
 CMakeLists.txt
+.idea/
+venv/

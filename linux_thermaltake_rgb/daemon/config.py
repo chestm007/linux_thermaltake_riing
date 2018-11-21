@@ -17,9 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-PROTOCOL_GET = 0x33
-PROTOCOL_SET = 0x32
+import os
 
-PROTOCOL_FAN = 0x51
-PROTOCOL_LIGHT = 0x52
+import yaml
 
+
+class Config:
+    config_dir = '/etc/linux_thermaltake_rgb'
+    config_file_name = 'config.yml'
+
+    def __init__(self):
+        if not os.path.isdir(self.config_dir):
+            os.mkdir(self.config_dir)
+
+        with open('{}/{}'.format(self.config_dir, self.config_file_name)) as cfg:
+            config = yaml.load(cfg)
+            self.devices = config.get('devices')
+            self.fan_controller = config.get('fan_controller')
+            self.lighting_controller = config.get('lighting_controller')

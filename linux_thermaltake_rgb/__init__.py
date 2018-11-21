@@ -17,14 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-from daemon.devices import ThermaltakeDevice
-from daemon.devices.fans import ThermaltakeRiingPlusFan
-from daemon.devices.pumps import ThermaltakeRiingPlusFloeRGB
-from globals.device_definitions import RIING_PLUS, FLOE_RIING_RGB
+import logging
+import os
 
-
-def device_factory(daemon, id: int, _type: str) -> ThermaltakeDevice:
-    if _type == RIING_PLUS:
-        return ThermaltakeRiingPlusFan(daemon, id)
-    elif _type == FLOE_RIING_RGB:
-        return ThermaltakeRiingPlusFloeRGB(daemon, id)
+LOGGER = logging.getLogger(__name__)
+DEBUG = bool(os.environ.get('DEBUG', False))

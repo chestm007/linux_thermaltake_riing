@@ -20,13 +20,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import time
 from threading import Thread
 
-from daemon.config import Config
-from daemon.dbus_service.service import ThermaltakeDbusService
-from daemon.devices import ThermaltakeFanDevice, ThermaltakeRGBDevice
-from daemon.devices.factory import device_factory
-from daemon.fan_manager import FanManager, fan_controller_factory
-from daemon.lighting_manager import LightingManager, lighting_controller_factory
-from driver.driver import ThermaltakeRiingPlusDriver
+from linux_thermaltake_rgb.daemon.config import Config
+from linux_thermaltake_rgb.daemon.dbus_service.service import ThermaltakeDbusService
+from linux_thermaltake_rgb.daemon.devices import ThermaltakeFanDevice, ThermaltakeRGBDevice
+from linux_thermaltake_rgb.daemon.devices.factory import device_factory
+from linux_thermaltake_rgb.daemon.fan_manager import FanManager, fan_controller_factory
+from linux_thermaltake_rgb.daemon.lighting_manager import LightingManager, lighting_controller_factory
+from linux_thermaltake_rgb.driver.driver import ThermaltakeRiingPlusDriver
 
 
 class ThermaltakeDaemon:

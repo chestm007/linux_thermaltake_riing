@@ -1,4 +1,3 @@
-
 """
 linux_thermaltake_rgb
 Software to control your thermaltake hardware
@@ -18,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-from daemon.devices import ThermaltakeRGBDevice
+PROTOCOL_GET = 0x33
+PROTOCOL_SET = 0x32
 
-
-class ThermaltakeRiingPlusFloeRGB(ThermaltakeRGBDevice):
-    num_leds = 12
-    index_per_led = 3
+PROTOCOL_FAN = 0x51
+PROTOCOL_LIGHT = 0x52
