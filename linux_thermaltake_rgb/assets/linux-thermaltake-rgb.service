@@ -1,5 +1,5 @@
 [Unit]
-AssertPathExists=/etc/thermaltake_riing/config.yml
+AssertPathExists=/etc/linux_thermaltake_rgb/config.yml
 
 [Service]
 WorkingDirectory=/
