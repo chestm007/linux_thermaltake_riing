@@ -25,6 +25,7 @@ class ThermaltakeDevice:
     def __init__(self, driver, id: int):
         self.id = int(id)
         self.driver = driver
+        self.set = False
 
 
 class ThermaltakeRGBDevice(ThermaltakeDevice):
