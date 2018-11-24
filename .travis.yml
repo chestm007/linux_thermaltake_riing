@@ -11,6 +11,7 @@ before_install:
   - sudo apt-get install -y python3-dev
   - sudo apt-get install -y libdbus-glib-1-dev
   - sudo apt-get install -y libgirepository1.0-dev
+  - sudo apt-get install -y libcairo2-dev
 python:
   - '3.7'
   - '3.6'
