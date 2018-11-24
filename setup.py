@@ -7,7 +7,7 @@ with open('README.md') as f:
 
 setup(
     name='linux_thermaltake_rgb',
-    version=PROJECTVERSION,
+    version='PROJECTVERSION',
     packages=find_packages(),
     url='https://github.com/chestm007/linux_thermaltake_rgb',
     license='GPL-2.0',
