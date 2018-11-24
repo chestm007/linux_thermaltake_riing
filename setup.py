@@ -1,5 +1,3 @@
-import os
-import time
 from distutils.core import setup
 
 from setuptools import find_packages
@@ -7,11 +5,9 @@ from setuptools import find_packages
 with open('README.md') as f:
     readme = f.read()
 
-VERSION = os.environ.get('TRAVIS_TAG') or '0.0.0-{}'.format(time.time())
-
 setup(
     name='linux_thermaltake_rgb',
-    version=VERSION,
+    version='PROJECTVERSION',
     packages=find_packages(),
     url='https://github.com/chestm007/linux_thermaltake_rgb',
     license='GPL-2.0',

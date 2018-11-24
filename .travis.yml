@@ -1,18 +1,45 @@
 os: linux
-dist: trusty
+dist: xenial
 group: stable
 language: python
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y python3-gi python3-dbus
+  - sudo apt-get install -y git
+  - sudo apt-get install -y virtualenv
+  - sudo apt-get install -y build-essential
+  - sudo apt-get install -y python3-dev
+  - sudo apt-get install -y libdbus-glib-1-dev
+  - sudo apt-get install -y libgirepository1.0-dev
+  - sudo apt-get install -y libcairo2-dev
 python:
-- '3.6'
+  - '3.7'
+  - '3.6'
 install:
-- pip install
+  - sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
+  - pip3 install .
 script:
-- echo "todo"
-deploy:
-  provider: pypi
-  user: chestm007
-  password:
-    secure: LArf9AJVK5557Q1P+0DbI8LWaIZw/giFFHsHT6zU1hX7PS4tKA5pJfhylGizPn+S3n0geRs2NYJdpNpglJJQigKSsTIL0OetuNP5UzHKmlnKaamF5WzcyiajkqXWVN54zEcit+jrbKg7bdkrRvtxkKm518GJWP82q/Ekr4YPQ1UqNbKbHpPKMPILlaCxPLeNDvZ4H+q5pjBS2pVMhWtHhqEVt1/XWjLvZEQ9Ow16ml+CY1zN0yr6gkeL56H8bOoo2UbyHjKyKj2jioneenPPHXDjfL8xdZk2yEWzmTZCyNTMlbBggEXZIOoJrvtOOtfQeSZZ+C7+QcRksi5uIURLLOhlF8bopfwdlWIDhgk0XUE5e8GM74vfGUI0A2Hq41mLxpfODQN0e0kBxuCoMiIoGMV2Qt9cnPGDGa5M2OElQQIso8qpZ+FgEcHcVbOwKGHQgDMoMUW5nj35/HItgcUM6OgDFg/jsKZGrR4AYPSNb40v8nt3KhdlEKxxD5wQcTbabDO5Bl1UgDOnJ1UpTrfUNb0iqwgGDOPjxEDNqMktNdxU/pcQe6jKOOw3BqAp1lGeqZqh4oAEt4UvkI44k0Pr75LX3xMopRkoh7tQkOuuZqNoMQvcKka/cPUU49XIZnW/veTsMKJ4qb/LII6tf3m6BYd7zQRg/R8S3IAT0KygQZU=
-  on:
-    branch: master
-    tags: true
+- echo "need to run tests here instead of echoing as its UNRELIABLE"
+jobs:
+  include:
+    - stage: deploy-dev
+      python: '3.7'
+      deploy:
+        skip_cleanup: true
+        provider: pypi
+        user: chestm007
+        password:
+          secure: "g4qbZJ1Q82RilhEllLj9BLOYwKTLxow+miyR2Al26UgMr27QqWhPozKEjQbO5Nqb0VX15b9jIWTX3Dl79hULfOiWvuMsNJODvTf7S3XVqPj22UCrks4H5kA7oIoo+dta6dHGFUeVmhwnH2j4vbSUXrhIRyD5flgAqxBzAGE0nLOy0UlDl9/GuUDs+i/tbXzqXcQM5PcXliUgq51kXYo3e3mt0WrkhuImo4y3IanpvK7C0Wav2n4HtlATjTXHtSzxAiJdlFvisbSjGEI0Jh3S5A+fJ4Z5Q5v4oQbcUS3Tnle1BeBI1j8cGEeXskXRO5YhFZNwnOW6HE5qkDiSyoTIpnhhDSIRwXJudWKoTwTwwUG/ewsElLA8FJABFEzJ7lLbSiwOyIouRYVrA0gK9+cZuAtwu/7uSTr9H9PEMq/+4hsNLF5VsTGv62cVX76xWcXiqZhpR4i/91JfLJSR2zW5288xZU04zm2zxQHntmcWL2Olaf2LVOFbK7+T0UI2Na9FHkTADz0VWjt/uRauE0c86cV+vVuSTsUiIcoZgg7ZBD3xn/Mho2ZZ55KfPz99ma/ofscjeoIZKUr3FAUzllgaefYBew/8sMtCrutRzPVIhsIiSbAHuvWLXt1y0NxrrWVHac8siYTmRVnWbCM+XBhHnKqyUQZnP+KspntQewN3BEI="
+        on:
+          branch: master
+    - stage: deploy-release
+      python: '3.7'
+      deploy:
+        skip_cleanup: true
+        provider: pypi
+        user: chestm007
+        password:
+          secure: "g4qbZJ1Q82RilhEllLj9BLOYwKTLxow+miyR2Al26UgMr27QqWhPozKEjQbO5Nqb0VX15b9jIWTX3Dl79hULfOiWvuMsNJODvTf7S3XVqPj22UCrks4H5kA7oIoo+dta6dHGFUeVmhwnH2j4vbSUXrhIRyD5flgAqxBzAGE0nLOy0UlDl9/GuUDs+i/tbXzqXcQM5PcXliUgq51kXYo3e3mt0WrkhuImo4y3IanpvK7C0Wav2n4HtlATjTXHtSzxAiJdlFvisbSjGEI0Jh3S5A+fJ4Z5Q5v4oQbcUS3Tnle1BeBI1j8cGEeXskXRO5YhFZNwnOW6HE5qkDiSyoTIpnhhDSIRwXJudWKoTwTwwUG/ewsElLA8FJABFEzJ7lLbSiwOyIouRYVrA0gK9+cZuAtwu/7uSTr9H9PEMq/+4hsNLF5VsTGv62cVX76xWcXiqZhpR4i/91JfLJSR2zW5288xZU04zm2zxQHntmcWL2Olaf2LVOFbK7+T0UI2Na9FHkTADz0VWjt/uRauE0c86cV+vVuSTsUiIcoZgg7ZBD3xn/Mho2ZZ55KfPz99ma/ofscjeoIZKUr3FAUzllgaefYBew/8sMtCrutRzPVIhsIiSbAHuvWLXt1y0NxrrWVHac8siYTmRVnWbCM+XBhHnKqyUQZnP+KspntQewN3BEI="
+        on:
+          branch: master
+          tags: true
