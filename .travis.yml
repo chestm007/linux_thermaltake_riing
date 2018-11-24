@@ -12,6 +12,7 @@ before_install:
   - sudo apt-get install -y libdbus-glib-1-dev
   - sudo apt-get install -y libgirepository1.0-dev
   - sudo apt-get install -y libcairo2-dev
+  - sudo pip3 install pycairo
 python:
   - '3.7'
   - '3.6'
@@ -22,6 +23,16 @@ script:
 - echo "need to run tests here instead of echoing as its UNRELIABLE"
 jobs:
   include:
+    - stage: deploy-dev
+      python: '3.7'
+      deploy:
+        skip_cleanup: true
+        provider: pypi
+        user: chestm007
+        password:
+          secure: "g4qbZJ1Q82RilhEllLj9BLOYwKTLxow+miyR2Al26UgMr27QqWhPozKEjQbO5Nqb0VX15b9jIWTX3Dl79hULfOiWvuMsNJODvTf7S3XVqPj22UCrks4H5kA7oIoo+dta6dHGFUeVmhwnH2j4vbSUXrhIRyD5flgAqxBzAGE0nLOy0UlDl9/GuUDs+i/tbXzqXcQM5PcXliUgq51kXYo3e3mt0WrkhuImo4y3IanpvK7C0Wav2n4HtlATjTXHtSzxAiJdlFvisbSjGEI0Jh3S5A+fJ4Z5Q5v4oQbcUS3Tnle1BeBI1j8cGEeXskXRO5YhFZNwnOW6HE5qkDiSyoTIpnhhDSIRwXJudWKoTwTwwUG/ewsElLA8FJABFEzJ7lLbSiwOyIouRYVrA0gK9+cZuAtwu/7uSTr9H9PEMq/+4hsNLF5VsTGv62cVX76xWcXiqZhpR4i/91JfLJSR2zW5288xZU04zm2zxQHntmcWL2Olaf2LVOFbK7+T0UI2Na9FHkTADz0VWjt/uRauE0c86cV+vVuSTsUiIcoZgg7ZBD3xn/Mho2ZZ55KfPz99ma/ofscjeoIZKUr3FAUzllgaefYBew/8sMtCrutRzPVIhsIiSbAHuvWLXt1y0NxrrWVHac8siYTmRVnWbCM+XBhHnKqyUQZnP+KspntQewN3BEI="
+        on:
+          branch: master
     - stage: deploy-release
       python: '3.7'
       deploy:
@@ -33,13 +44,3 @@ jobs:
         on:
           branch: master
           tags: true
-    - stage: deploy-dev
-      python: '3.7'
-      deploy:
-        skip_cleanup: true
-        provider: pypi
-        user: chestm007
-        password:
-          secure: "g4qbZJ1Q82RilhEllLj9BLOYwKTLxow+miyR2Al26UgMr27QqWhPozKEjQbO5Nqb0VX15b9jIWTX3Dl79hULfOiWvuMsNJODvTf7S3XVqPj22UCrks4H5kA7oIoo+dta6dHGFUeVmhwnH2j4vbSUXrhIRyD5flgAqxBzAGE0nLOy0UlDl9/GuUDs+i/tbXzqXcQM5PcXliUgq51kXYo3e3mt0WrkhuImo4y3IanpvK7C0Wav2n4HtlATjTXHtSzxAiJdlFvisbSjGEI0Jh3S5A+fJ4Z5Q5v4oQbcUS3Tnle1BeBI1j8cGEeXskXRO5YhFZNwnOW6HE5qkDiSyoTIpnhhDSIRwXJudWKoTwTwwUG/ewsElLA8FJABFEzJ7lLbSiwOyIouRYVrA0gK9+cZuAtwu/7uSTr9H9PEMq/+4hsNLF5VsTGv62cVX76xWcXiqZhpR4i/91JfLJSR2zW5288xZU04zm2zxQHntmcWL2Olaf2LVOFbK7+T0UI2Na9FHkTADz0VWjt/uRauE0c86cV+vVuSTsUiIcoZgg7ZBD3xn/Mho2ZZ55KfPz99ma/ofscjeoIZKUr3FAUzllgaefYBew/8sMtCrutRzPVIhsIiSbAHuvWLXt1y0NxrrWVHac8siYTmRVnWbCM+XBhHnKqyUQZnP+KspntQewN3BEI="
-        on:
-          branch: master
