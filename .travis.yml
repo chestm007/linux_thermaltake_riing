@@ -1,18 +1,35 @@
 os: linux
-dist: trusty
+dist: xenial
 group: stable
 language: python
 python:
-- '3.6'
+  - '3.7'
+  - '3.6'
 install:
-- pip install
+  - sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
+  - pip3 install .
 script:
-- echo "todo"
-deploy:
-  provider: pypi
-  user: chestm007
-  password:
-    secure: LArf9AJVK5557Q1P+0DbI8LWaIZw/giFFHsHT6zU1hX7PS4tKA5pJfhylGizPn+S3n0geRs2NYJdpNpglJJQigKSsTIL0OetuNP5UzHKmlnKaamF5WzcyiajkqXWVN54zEcit+jrbKg7bdkrRvtxkKm518GJWP82q/Ekr4YPQ1UqNbKbHpPKMPILlaCxPLeNDvZ4H+q5pjBS2pVMhWtHhqEVt1/XWjLvZEQ9Ow16ml+CY1zN0yr6gkeL56H8bOoo2UbyHjKyKj2jioneenPPHXDjfL8xdZk2yEWzmTZCyNTMlbBggEXZIOoJrvtOOtfQeSZZ+C7+QcRksi5uIURLLOhlF8bopfwdlWIDhgk0XUE5e8GM74vfGUI0A2Hq41mLxpfODQN0e0kBxuCoMiIoGMV2Qt9cnPGDGa5M2OElQQIso8qpZ+FgEcHcVbOwKGHQgDMoMUW5nj35/HItgcUM6OgDFg/jsKZGrR4AYPSNb40v8nt3KhdlEKxxD5wQcTbabDO5Bl1UgDOnJ1UpTrfUNb0iqwgGDOPjxEDNqMktNdxU/pcQe6jKOOw3BqAp1lGeqZqh4oAEt4UvkI44k0Pr75LX3xMopRkoh7tQkOuuZqNoMQvcKka/cPUU49XIZnW/veTsMKJ4qb/LII6tf3m6BYd7zQRg/R8S3IAT0KygQZU=
-  on:
-    branch: master
-    tags: true
+- echo "need to run tests here instead of echoing as its UNRELIABLE"
+jobs:
+  include:
+    - stage: deploy-release
+      python: '3.7'
+      deploy:
+        skip_cleanup: true
+        provider: pypi
+        user: chestm007
+        password:
+          secure: LArf9AJVK5557Q1P+0DbI8LWaIZw/giFFHsHT6zU1hX7PS4tKA5pJfhylGizPn+S3n0geRs2NYJdpNpglJJQigKSsTIL0OetuNP5UzHKmlnKaamF5WzcyiajkqXWVN54zEcit+jrbKg7bdkrRvtxkKm518GJWP82q/Ekr4YPQ1UqNbKbHpPKMPILlaCxPLeNDvZ4H+q5pjBS2pVMhWtHhqEVt1/XWjLvZEQ9Ow16ml+CY1zN0yr6gkeL56H8bOoo2UbyHjKyKj2jioneenPPHXDjfL8xdZk2yEWzmTZCyNTMlbBggEXZIOoJrvtOOtfQeSZZ+C7+QcRksi5uIURLLOhlF8bopfwdlWIDhgk0XUE5e8GM74vfGUI0A2Hq41mLxpfODQN0e0kBxuCoMiIoGMV2Qt9cnPGDGa5M2OElQQIso8qpZ+FgEcHcVbOwKGHQgDMoMUW5nj35/HItgcUM6OgDFg/jsKZGrR4AYPSNb40v8nt3KhdlEKxxD5wQcTbabDO5Bl1UgDOnJ1UpTrfUNb0iqwgGDOPjxEDNqMktNdxU/pcQe6jKOOw3BqAp1lGeqZqh4oAEt4UvkI44k0Pr75LX3xMopRkoh7tQkOuuZqNoMQvcKka/cPUU49XIZnW/veTsMKJ4qb/LII6tf3m6BYd7zQRg/R8S3IAT0KygQZU=
+        on:
+          branch: master
+          tags: true
+    - stage: deploy-dev
+      python: '3.7'
+      deploy:
+        skip_cleanup: true
+        provider: pypi
+        user: chestm007
+        password:
+          secure: LArf9AJVK5557Q1P+0DbI8LWaIZw/giFFHsHT6zU1hX7PS4tKA5pJfhylGizPn+S3n0geRs2NYJdpNpglJJQigKSsTIL0OetuNP5UzHKmlnKaamF5WzcyiajkqXWVN54zEcit+jrbKg7bdkrRvtxkKm518GJWP82q/Ekr4YPQ1UqNbKbHpPKMPILlaCxPLeNDvZ4H+q5pjBS2pVMhWtHhqEVt1/XWjLvZEQ9Ow16ml+CY1zN0yr6gkeL56H8bOoo2UbyHjKyKj2jioneenPPHXDjfL8xdZk2yEWzmTZCyNTMlbBggEXZIOoJrvtOOtfQeSZZ+C7+QcRksi5uIURLLOhlF8bopfwdlWIDhgk0XUE5e8GM74vfGUI0A2Hq41mLxpfODQN0e0kBxuCoMiIoGMV2Qt9cnPGDGa5M2OElQQIso8qpZ+FgEcHcVbOwKGHQgDMoMUW5nj35/HItgcUM6OgDFg/jsKZGrR4AYPSNb40v8nt3KhdlEKxxD5wQcTbabDO5Bl1UgDOnJ1UpTrfUNb0iqwgGDOPjxEDNqMktNdxU/pcQe6jKOOw3BqAp1lGeqZqh4oAEt4UvkI44k0Pr75LX3xMopRkoh7tQkOuuZqNoMQvcKka/cPUU49XIZnW/veTsMKJ4qb/LII6tf3m6BYd7zQRg/R8S3IAT0KygQZU=
+        on:
+          branch: master
