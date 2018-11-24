@@ -1,9 +1,9 @@
 # Linux driver and daemon for Thermaltake Riing
 
 ## Compatibility
-currently supported devices are (as they show up in thermaltakes TTRGBPLUS software: 
-    Riing Plus 
-    Flow Riing RGB 
+currently supported devices are (as they show up in thermaltakes TTRGBPLUS software:  
+    Riing Plus  
+    Flow Riing RGB  
 If your's isnt listed, please create an issue and I'll implement it ASAP!! 
 
 ## Installation
