@@ -20,13 +20,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import usb
 
 
-class ThermaltakeRiingPlusDriver:
+class ThermaltakeG3ControllerDriver:
     VENDOR_ID = 0x264a
-    PRODUCT_ID = 0x1fa5
+    PRODUCT_ID_BASE = 0x1fa5
 
-    def __init__(self):
+    def __init__(self, unit=1):
         self.vendor_id = self.VENDOR_ID
-        self.product_id = self.PRODUCT_ID
+        self.product_id = self.PRODUCT_ID_BASE + (unit - 1)
 
         self._initialize_device()
 

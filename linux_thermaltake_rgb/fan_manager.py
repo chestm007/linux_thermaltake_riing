@@ -25,14 +25,14 @@ from psutil import sensors_temperatures
 from linux_thermaltake_rgb import LOGGER
 
 
-def fan_controller_factory(type=None, *args, **kwargs):
-    if type == 'locked_speed':
-        return LockedSpeedController(*args, **kwargs)
-    elif type == 'temp_target':
-        return TempTargetController(*args, **kwargs)
+def fan_model_factory(model=None, *args, **kwargs):
+    if model == 'locked_speed':
+        return LockedSpeedModel(*args, **kwargs)
+    elif model == 'temp_target':
+        return TempTargetModel(*args, **kwargs)
 
 
-class FanController:
+class FanModel:
     def main(self):
         """
         returns an integer between 0 and 100 to set the fan speed too
@@ -40,7 +40,7 @@ class FanController:
         raise NotImplementedError
 
 
-class TempTargetController(FanController):
+class TempTargetModel(FanModel):
     def __init__(self, target, sensor_name, multiplier: int = 5):
         self.sensor_name = sensor_name
         self.target = float(target)
@@ -66,7 +66,7 @@ class TempTargetController(FanController):
         return f'target {self.target}°C on sensor {self.sensor_name}'
 
 
-class LockedSpeedController(FanController):
+class LockedSpeedModel(FanModel):
     def __init__(self, speed):
         if not 0 <= speed <= 100:
             raise ValueError(f'Speed must be between 0 and 100, got {speed}')
@@ -81,28 +81,28 @@ class LockedSpeedController(FanController):
 
 
 class FanManager:
-    def __init__(self, initial_controller: FanController = None):
+    def __init__(self, initial_model: FanModel = None):
         self._continue = False
         self._thread = Thread(target=self._main_loop)
         self._devices = []
-        self._controller = initial_controller
+        self._model = initial_model
 
     def attach_device(self, device):
         self._devices.append(device)
 
-    def set_controller(self, controller: FanController):
-        if isinstance(controller, FanController):
-            self._controller = controller
+    def set_controller(self, model: FanModel):
+        if isinstance(model, FanModel):
+            self._model = model
 
     def _main_loop(self):
         while self._continue:
-            speed = self._controller.main()
+            speed = self._model.main()
             for dev in self._devices:
                 dev.set_fan_speed(speed)
             time.sleep(5)
 
     def start(self):
-        LOGGER.info(f'Starting fan manager ({self._controller})...')
+        LOGGER.info(f'Starting fan manager ({self._model})...')
         self._continue = True
         self._thread.start()
 

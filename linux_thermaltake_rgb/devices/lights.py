@@ -17,3 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+from linux_thermaltake_rgb.devices import ThermaltakeRGBDevice
+
+
+class ThermaltakePR22D5Res(ThermaltakeRGBDevice):
+    num_leds = 12
+    index_per_led = 3
+
+
+class ThermaltakeW4PlusWB(ThermaltakeRGBDevice):
+    num_leds = 12
+    index_per_led = 3
+
+
+class ThermaltakeVGTX1080PlusWB(ThermaltakeRGBDevice):
+    num_leds = 12
+    index_per_led = 3
+
+
+class ThermaltakeRadPlusLED(ThermaltakeRGBDevice):
+    num_leds = 12
+    index_per_led = 3
+
+
+class ThermaltakeLumiPlusLED(ThermaltakeRGBDevice):
+    num_leds = 12
+    index_per_led = 3

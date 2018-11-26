@@ -5,8 +5,8 @@ import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GObject
 
-from linux_thermaltake_rgb.daemon.fan_manager import fan_controller_factory
-from linux_thermaltake_rgb.daemon.lighting_manager import lighting_controller_factory
+from linux_thermaltake_rgb.fan_manager import fan_model_factory
+from linux_thermaltake_rgb.lighting_manager import lighting_model_factory
 
 DBusGMainLoop(set_as_default=True)
 
@@ -28,8 +28,8 @@ class ThermaltakeDbusService(dbus.service.Object):
     def set_fan_controller(self, *args):
         if len(args) > 0:
             if args[0] in ('locked_speed', 'temp_target'):
-                fc = fan_controller_factory(*args)
-                self.daemon.fan_manager.set_controller(fc)
+                fc = fan_model_factory(*args)
+                self.daemon.fan_manager.set_model(fc)
                 return "success"
         return "argument 0 must be in [locked_speed|temp_target]"
 
@@ -38,8 +38,8 @@ class ThermaltakeDbusService(dbus.service.Object):
         if len(args) > 0:
             if args[0] in ('static', 'alternating', 'rgb_spectrum',
                            'spinning_rgb_spectrum', 'temperature'):
-                fc = lighting_controller_factory(*args)
-                self.daemon.lighting_manager.set_controller(fc)
+                fc = lighting_model_factory(*args)
+                self.daemon.lighting_manager.set_model(fc)
                 return "success"
         return "argument 0 must be in [static|alternating|rgb_spectrum]"
 
