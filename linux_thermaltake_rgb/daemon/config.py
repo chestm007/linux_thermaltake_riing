@@ -21,9 +21,12 @@ import os
 
 import yaml
 
+from linux_thermaltake_rgb import LOGGER
+
 
 class Config:
-    config_dir = '/etc/linux_thermaltake_rgb'
+    # config_dir = '/etc/linux_thermaltake_rgb'
+    config_dir = 'linux_thermaltake_rgb/assets'
     config_file_name = 'config.yml'
 
     def __init__(self):
@@ -32,6 +35,10 @@ class Config:
 
         with open('{}/{}'.format(self.config_dir, self.config_file_name)) as cfg:
             config = yaml.load(cfg)
-            self.devices = config.get('devices')
-            self.fan_controller = config.get('fan_controller')
-            self.lighting_controller = config.get('lighting_controller')
+            self.controllers = config.get('controllers')
+            LOGGER.info(config.get('controllers'))
+            # self.devices = config.get('devices')
+            LOGGER.info(config.get('fan_manager'))
+            self.fan_manager = config.get('fan_manager')
+            LOGGER.info(config.get('lighting_manager'))
+            self.lighting_manager = config.get('lighting_manager')

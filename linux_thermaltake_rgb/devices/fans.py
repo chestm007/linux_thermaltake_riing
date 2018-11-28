@@ -17,3 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+from linux_thermaltake_rgb.devices import ThermaltakeRGBDevice, ThermaltakeFanDevice
+
+
+class ThermaltakeRiingPlusFan(ThermaltakeRGBDevice, ThermaltakeFanDevice):
+    num_leds = 12
+    index_per_led = 3

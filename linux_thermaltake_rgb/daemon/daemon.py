@@ -20,40 +20,51 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import time
 from threading import Thread
 
+from linux_thermaltake_rgb import LOGGER
+from linux_thermaltake_rgb.controllers import controller_factory
+from linux_thermaltake_rgb.fan_manager import fan_model_factory
+from linux_thermaltake_rgb.lighting_manager import lighting_model_factory
 from linux_thermaltake_rgb.daemon.config import Config
 from linux_thermaltake_rgb.daemon.dbus_service.service import ThermaltakeDbusService
-from linux_thermaltake_rgb.daemon.devices import ThermaltakeFanDevice, ThermaltakeRGBDevice
-from linux_thermaltake_rgb.daemon.devices.factory import device_factory
-from linux_thermaltake_rgb.daemon.fan_manager import FanManager, fan_controller_factory
 from linux_thermaltake_rgb.daemon.lighting_manager import LightingEffect
-from linux_thermaltake_rgb.driver.driver import ThermaltakeRiingPlusDriver
+from linux_thermaltake_rgb import devices
+from linux_thermaltake_rgb.fan_manager import FanManager
+from linux_thermaltake_rgb.devices import factory
 
 
 class ThermaltakeDaemon:
     def __init__(self):
         self.config = Config()
 
-        fan_controller = fan_controller_factory(**self.config.fan_controller)
-        self.fan_manager = FanManager(fan_controller)
+        fan_model = fan_model_factory(**self.config.fan_manager)
+        self.fan_manager = FanManager(fan_model)
 
         self.lighting_manager = LightingEffect.factory(self.config.lighting_controller)
 
         self.dbus_service = ThermaltakeDbusService(self)
 
-        self.driver = ThermaltakeRiingPlusDriver()
-        self._thread = Thread(target=self._main_loop)
         self.attached_devices = {}
-        self._continue = False
-        for id, _type in self.config.devices.items():
-            self.register_attached_device(id, _type)
+        self.controllers = {}
 
-    def register_attached_device(self, id: int, _type: str):
-        dev = device_factory(self.driver, int(id), _type)
-        if isinstance(dev, ThermaltakeFanDevice):
+        for controller in self.config.controllers:
+            LOGGER.info(controller)
+            self.controllers[controller['unit']] = controller_factory(controller['type'], controller['unit'])
+            for id, _type in controller['devices'].items():
+                dev = factory.device_factory(self.controllers[controller['unit']], id, _type)
+                self.controllers[controller['unit']].attach_device(id, dev)
+                self.register_attached_device(controller['unit'], id, dev)
+
+        self._thread = Thread(target=self._main_loop)
+
+        self._continue = False
+
+    def register_attached_device(self, unit, port, dev=None):
+        if isinstance(dev, devices.ThermaltakeFanDevice):
             self.fan_manager.attach_device(dev)
-        if isinstance(dev, ThermaltakeRGBDevice):
+        if isinstance(dev, devices.ThermaltakeRGBDevice):
             self.lighting_manager.attach_device(dev)
-        self.attached_devices[id] = device_factory(self.driver, int(id), _type)
+
+        self.attached_devices[str(unit)+":"+str(port)] = dev
 
     def run(self):
         self._continue = True

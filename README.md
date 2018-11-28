@@ -1,18 +1,18 @@
 # Linux driver and daemon for Thermaltake Riing
 
 ## Compatibility
-currently supported devices are (as they show up in thermaltakes TTRGBPLUS software:
-    Riing Plus
-    Flow Riing RGB
-If your's isnt listed, please create an issue and I'll implement it ASAP!!
+currently supported devices are (as they show up in thermaltakes TTRGBPLUS software:  
+    Riing Plus  
+    Flow Riing RGB  
+If your's isnt listed, please create an issue and I'll implement it ASAP!! 
 
 ## Installation
 
 ### Pypi
-The setup file will create the systemd user unit, and udev rule
-`sudo pip install linux-thermaltake-rgb`
+The setup file will create the systemd user unit, and udev rule 
+`sudo pip install linux_thermaltake_rgb` 
 
-then add your user to the `plugdev` group - `sudo usermod -a -G plugdev <user>`
+then add your user to the `plugdev` group - `sudo usermod -a -G plugdev <user>` 
 
 then reconnect your device. (you may need to log out and back in so your
 user is recognised as being in the `plugdev` group
