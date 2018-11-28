@@ -17,20 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+import math
 import time
 from threading import Thread
 
 from psutil import sensors_temperatures
 
 from linux_thermaltake_rgb import LOGGER
-from linux_thermaltake_rgb.daemon.lighting_manager.utils.colours import compass_to_rgb
 
 
-def lighting_controller_factory(*args, **kwargs):
+def lighting_model_factory(*args, **kwargs):
     effect = None
     if not args:
         kwargs = dict(kwargs)
-        _type = kwargs.pop('type')
+        _type = kwargs.pop('model')
     else:
         args = list(args)
         _type = args.pop(0)
@@ -47,7 +47,35 @@ def lighting_controller_factory(*args, **kwargs):
         effect = TemperatureLightingEffect(*args, **kwargs)
 
     if effect is not None:
-        return LightingController(effect)
+        return LightingModel(effect)
+
+
+def compass_to_rgb(h, s=1, v=1):
+    h = float(h)
+    s = float(s)
+    v = float(v)
+    h60 = h / 60.0
+    h60f = math.floor(h60)
+    hi = int(h60f) % 6
+    f = h60 - h60f
+    p = v * (1 - s)
+    q = v * (1 - f * s)
+    t = v * (1 - (1 - f) * s)
+    r, g, b = 0, 0, 0
+    if hi == 0:
+        r, g, b = v, t, p
+    elif hi == 1:
+        r, g, b = q, v, p
+    elif hi == 2:
+        r, g, b = p, v, t
+    elif hi == 3:
+        r, g, b = p, q, v
+    elif hi == 4:
+        r, g, b = t, p, v
+    elif hi == 5:
+        r, g, b = v, p, q
+    r, g, b = int(r * 255), int(g * 255), int(b * 255)
+    return g, r, b
 
 
 class LightingEffect:
@@ -168,7 +196,7 @@ class TemperatureLightingEffect(LightingEffect):
         return f'temperature lighting'
 
 
-class LightingController:
+class LightingModel:
     def __init__(self, lighting_effect):
         self.lighting_effect = lighting_effect
         self.brightness_level = 100
@@ -195,41 +223,41 @@ class LightingController:
 
 
 class LightingManager:
-    def __init__(self, initial_controller: LightingController = None):
+    def __init__(self, initial_model: LightingModel = None):
         self._continue = False
         self._thread = Thread(target=self._main_loop)
         self._devices = []
-        self._controller = initial_controller
+        self._model = initial_model
 
     def attach_device(self, device):
         self._devices.append(device)
 
-    def set_controller(self, controller: LightingController):
-        if isinstance(controller, LightingController):
-            self._controller = controller
+    def set_model(self, model: LightingModel):
+        if isinstance(model, LightingModel):
+            self._model = model
 
     def set_brightness(self, brightness: int):
         if brightness < 0:
             brightness = 0
         elif brightness > 300:
             brightness = 300
-        self._controller.brightness_level = int(brightness)
+        self._model.brightness_level = int(brightness)
 
     def set_light_update_msec(self, sec: int):
         if sec > 0:
-            self._controller.update_msec = int(sec)
+            self._model.update_msec = int(sec)
 
     def _main_loop(self):
         next_poll_msec = 1
         while self._continue:
-            self._controller.lighting_effect.begin_all()
+            self._model.lighting_effect.begin_all()
             for dev in self._devices:
-                data, next_poll_msec = self._controller.main(dev)
+                data, next_poll_msec = self._model.main(dev)
                 dev.set_lighting(data)
             time.sleep(next_poll_msec / 1000)
 
     def start(self):
-        LOGGER.info(f'Starting lighting manager ({self._controller})...')
+        LOGGER.info(f'Starting lighting manager ({self._model})...')
         self._continue = True
         self._thread.start()
 

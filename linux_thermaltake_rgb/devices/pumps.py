@@ -17,5 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-FLOE_RIING_RGB = 'Floe Riing RGB'
-RIING_PLUS = 'Riing Plus'
+from linux_thermaltake_rgb.devices import ThermaltakeRGBDevice
+
+
+class ThermaltakeRiingPlusFloeRGB(ThermaltakeRGBDevice):
+    num_leds = 12
+    index_per_led = 3
