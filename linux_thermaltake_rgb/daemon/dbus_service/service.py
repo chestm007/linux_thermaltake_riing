@@ -6,7 +6,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GObject
 
 from linux_thermaltake_rgb.fan_manager import fan_model_factory
-from linux_thermaltake_rgb.daemon.lighting_manager import LightingEffect
+from linux_thermaltake_rgb.lighting_manager import LightingEffect
 
 DBusGMainLoop(set_as_default=True)
 

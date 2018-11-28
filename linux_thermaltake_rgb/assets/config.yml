@@ -1,3 +1,10 @@
+#####################################################################
+#
+#  This default config file outlines most of the configuration
+#   possible using this software, probably don't uncomment it all
+#
+#####################################################################
+
 controllers:
   - unit: 1
     type: g3
@@ -5,49 +12,51 @@ controllers:
       1: Riing Plus
       2: Riing Plus
       3: Riing Plus
-      4: Pacific V-GTX 1080Ti Plus GPU Waterblock
-      5: Pacific Rad Plus LED Panel
-  - unit: 2
-    type: g3
-    devices:
-      1: Riing Plus
-      2: Riing Plus
-      3: Riing Plus
-      4: Pacific V-GTX 1080Ti Plus GPU Waterblock
-      5: Pacific W4 Plus CPU Waterblock
-  - unit: 3
-    type: g3
-    devices:
-      1: Riing Plus
-      2: Riing Plus
-      3: Riing Plus
-      4: Pacific V-GTX 1080Ti Plus GPU Waterblock
-      5: Pacific PR22-D5 Plus
-  - unit: 4
-    type: g3
-    devices:
-      1: Riing Plus
-      2: Riing Plus
-      3: Riing Plus
-      4: Pacific V-GTX 1080Ti Plus GPU Waterblock
-      5: Lumi Plus LED Strip
-  - unit: 5
-    type: g3
-    devices:
-      1: Riing Plus
-      2: Riing Plus
-      3: Riing Plus
       4: Riing Plus
-      5: Lumi Plus LED Strip
-fan_controller:
-#  type: locked_speed
+      5: Floe Riing RGB
+#  - unit: 2
+#    type: g3
+#    devices:
+#      1: Riing Plus
+#      2: Riing Plus
+#      3: Riing Plus
+#      4: Pacific V-GTX 1080Ti Plus GPU Waterblock
+#      5: Pacific W4 Plus CPU Waterblock
+#  - unit: 3
+#    type: g3
+#    devices:
+#      1: Riing Plus
+#      2: Riing Plus
+#      3: Riing Plus
+#      4: Pacific V-GTX 1080Ti Plus GPU Waterblock
+#      5: Pacific PR22-D5 Plus
+#  - unit: 4
+#    type: g3
+#    devices:
+#      1: Riing Plus
+#      2: Riing Plus
+#      3: Riing Plus
+#      4: Pacific V-GTX 1080Ti Plus GPU Waterblock
+#      5: Lumi Plus LED Strip
+#  - unit: 5
+#    type: g3
+#    devices:
+#      1: Riing Plus
+#      2: Riing Plus
+#      3: Riing Plus
+#      4: Riing Plus
+#      5: Lumi Plus LED Strip
+
+fan_manager:
+#  model: locked_speed
 #  speed: 50
 
-#  type: temp_target
-#  target: 38
-#  sensor_name: k10temp
-#  multiplier: 5
-lighting_controller:
+  model: temp_target
+  target: 38
+  sensor_name: k10temp
+  multiplier: 5
+
+lighting_manager:
 # speed: normal
 
 #  model: temperature
@@ -67,10 +76,10 @@ lighting_controller:
 #    g: 50
 #    b: 0
 
-#  model: full
-#  r: 50
-#  g: 0
-#  b: 0
+  model: full
+  r: 40
+  g: 0
+  b: 0
 
 # model: flow
 
