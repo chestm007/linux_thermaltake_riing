@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+from collections import namedtuple
+
 from linux_thermaltake_rgb.globals.protocol_definitions import PROTOCOL_SET, PROTOCOL_LIGHT, PROTOCOL_FAN, PROTOCOL_GET
 
 
@@ -32,16 +34,21 @@ class ThermaltakeRGBDevice(ThermaltakeDevice):
     num_leds = 0
     index_per_led = 0
 
-    def set_lighting(self, values: list) -> None:
+    def set_lighting(self, values: list=None, mode=0x18, speed=0x00) -> None:
         """
         for the sake of performance this will assume the data your passing in is correct.
         if it isnt the worst that will happen (i guess) is the lights wont show up as
         expected.
         :param values: [r,g,b...]
+        :param mode: lighting mode
         """
-        data = [PROTOCOL_SET, PROTOCOL_LIGHT, self.id, 0x18]
-        data.extend(values)
+        data = [PROTOCOL_SET, PROTOCOL_LIGHT, self.id, mode + speed]
+        if values:
+            data.extend(values)
         self.driver.write_out(data)
+
+
+FanSpeed = namedtuple('FanSpeed', ['set_speed', 'rpm'])
 
 
 class ThermaltakeFanDevice(ThermaltakeDevice):
@@ -52,4 +59,5 @@ class ThermaltakeFanDevice(ThermaltakeDevice):
     def get_fan_speed(self):
         data = [PROTOCOL_GET, PROTOCOL_FAN, self.id]
         self.driver.write_out(data)
-        self.driver.read_in()
+        id, unknown, speed, rpm_l, rpm_h = self.driver.read_in()[2:7]
+        return FanSpeed(speed, (rpm_h << 8) + rpm_l)

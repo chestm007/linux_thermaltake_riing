@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-from enum import Enum
 
 import usb
 
@@ -25,24 +24,6 @@ import usb
 class ThermaltakeRiingPlusDriver:
     VENDOR_ID = 0x264a
     PRODUCT_ID = 0x1fa5
-
-    # credit: https://github.com/devcompl/riingplusapi
-    class RGB(Enum):
-        class Mode(Enum):
-            FLOW = 0x00
-            SPECTRUM = 0x04
-            RIPPLE = 0x08
-            BLINK = 0x0c
-            PULSE = 0x10
-            WAVE = 0x14
-            BY_LED = 0x18
-            FULL = 0x19
-
-        class speed(Enum):
-            SLOW = 0x03
-            NORMAL = 0x02
-            FAST = 0x01
-            EXTREME = 0x00
 
     def __init__(self):
         self.vendor_id = self.VENDOR_ID

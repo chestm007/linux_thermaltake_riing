@@ -25,7 +25,7 @@ from linux_thermaltake_rgb.daemon.dbus_service.service import ThermaltakeDbusSer
 from linux_thermaltake_rgb.daemon.devices import ThermaltakeFanDevice, ThermaltakeRGBDevice
 from linux_thermaltake_rgb.daemon.devices.factory import device_factory
 from linux_thermaltake_rgb.daemon.fan_manager import FanManager, fan_controller_factory
-from linux_thermaltake_rgb.daemon.lighting_manager import LightingManager, lighting_controller_factory
+from linux_thermaltake_rgb.daemon.lighting_manager import LightingEffect
 from linux_thermaltake_rgb.driver.driver import ThermaltakeRiingPlusDriver
 
 
@@ -36,8 +36,7 @@ class ThermaltakeDaemon:
         fan_controller = fan_controller_factory(**self.config.fan_controller)
         self.fan_manager = FanManager(fan_controller)
 
-        lighting_controller = lighting_controller_factory(**self.config.lighting_controller)
-        self.lighting_manager = LightingManager(lighting_controller)
+        self.lighting_manager = LightingEffect.factory(self.config.lighting_controller)
 
         self.dbus_service = ThermaltakeDbusService(self)
 

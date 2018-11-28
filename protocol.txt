@@ -1,12 +1,16 @@
 V-- 32=set/33=get
 |  V-- 51=fan/52=light
 |  |  V-- device number
-|  |  |  V-- Command?
-|  |  |  |  V-- Command Variables
+|  |  |  V-- light:
+|  |  |  |   Mode 00=flow/04=spectrum/08=ripple/0c=blink/10=pulse/14=wave/18=perLEDcolor/19=full
+|  |  |  |   +Speed 00=Extreme/01=Fase/02=Normal/03=Slow
+|  |  |  |
+|  |  |  |   Fan:
+|  |  |  |   01=fixedspeed
+|  |  |  |   02=pwm
+|  |  |  |  V-- Command Variables light=rgb/fan=pwm_high:pwn_low
 32:52:03:18:00:ff:7f:00:ff:ff:00:7f:ff:00:00:ff:7f:00:ff:ff:00:ff:ff:00:7f:ff:00:00:ff:7f:00:ff:ff:00:7f:ff:00:00:ff:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:73
 
 
-mystery packet:
-- sent after sending lighting and fan speeds when saving.
-(nonpwm)
-32:53:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:c3
+Save settings to controller
+32:53

@@ -17,8 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+from enum import Enum
+
 PROTOCOL_GET = 0x33
 PROTOCOL_SET = 0x32
 
 PROTOCOL_FAN = 0x51
 PROTOCOL_LIGHT = 0x52
+
+
+# credit: https://github.com/devcompl/riingplusapi
+class RGB:
+    class Mode:
+        FLOW = 0x00
+        SPECTRUM = 0x04
+        RIPPLE = 0x08
+        BLINK = 0x0c
+        PULSE = 0x10
+        WAVE = 0x14
+        BY_LED = 0x18
+        FULL = 0x19
+
+    class Speed:
+        SLOW = 0x03
+        NORMAL = 0x02
+        FAST = 0x01
+        EXTREME = 0x00
+

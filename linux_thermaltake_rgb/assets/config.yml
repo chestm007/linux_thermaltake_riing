@@ -5,12 +5,54 @@ devices:
   4: Riing Plus
   5: Floe Riing RGB
 fan_controller:
-  type: temp_target
-  target: 38
-  sensor_name: k10temp
-  multiplier: 5
+#  type: locked_speed
+#  speed: 50
+
+#  type: temp_target
+#  target: 38
+#  sensor_name: k10temp
+#  multiplier: 5
 lighting_controller:
-  type: static
-  r: 50
-  g: 0
-  b: 0
+# speed: normal
+
+#  model: temperature
+#  sensor_name: k10temp
+#  cold: 30
+#  target: 40
+#  hot: 60
+#  speed: extreme
+
+#  model: alternating
+#  odd_rgb:
+#    r: 50
+#    g: 0
+#    b: 0
+#  even_rgb:
+#    r: 0
+#    g: 50
+#    b: 0
+
+#  model: full
+#  r: 50
+#  g: 0
+#  b: 0
+
+# model: flow
+
+# model: spectrum
+
+#  model: ripple
+#  r: 50
+#  g: 0
+#  b: 0
+
+#  model: blink
+#  r: 50
+#  g: 0
+#  b: 0
+
+#  model: pulse
+#  r: 50
+#  g: 0
+#  b: 0
+

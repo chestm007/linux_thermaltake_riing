@@ -17,134 +17,153 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+import pprint
 import time
+from collections import namedtuple
 from threading import Thread
 
 from psutil import sensors_temperatures
 
 from linux_thermaltake_rgb import LOGGER
 from linux_thermaltake_rgb.daemon.lighting_manager.utils.colours import compass_to_rgb
-
-
-def lighting_controller_factory(*args, **kwargs):
-    effect = None
-    if not args:
-        kwargs = dict(kwargs)
-        _type = kwargs.pop('type')
-    else:
-        args = list(args)
-        _type = args.pop(0)
-
-    if _type == 'static':
-        effect = StaticLightingEffect(*args, **kwargs)
-    elif _type == 'alternating':
-        effect = AlternatingLightingEffect(*args, **kwargs)
-    elif _type == 'rgb_spectrum':
-        effect = RGBSpectrumLightingEffect()
-    elif _type == 'spinning_rgb_spectrum':
-        effect = SpinningRGBSpectrumLightingEffect()
-    elif _type == 'temperature':
-        effect = TemperatureLightingEffect(*args, **kwargs)
-
-    if effect is not None:
-        return LightingController(effect)
+from linux_thermaltake_rgb.globals.protocol_definitions import RGB
 
 
 class LightingEffect:
-    def __iter__(self):
-        return self
+    model = None
 
-    def begin_dev(self):
-        pass
+    def __init__(self, config):
+        self._config = config
+        self._devices = []
+        LOGGER.info(f'initializing {self.__class__.__name__} light controller')
+
+    @classmethod
+    def inheritors(cls):
+        subclasses = set()
+        work = [cls]
+        while work:
+            parent = work.pop()
+            for child in parent.__subclasses__():
+                if child not in subclasses:
+                    subclasses.add(child)
+                    work.append(child)
+        return subclasses
+
+    @classmethod
+    def factory(cls, config):
+        subclass_dict = {clazz.model: clazz for clazz in cls.inheritors()}
+        LOGGER.warn(pprint.pformat(subclass_dict))
+        try:
+            return subclass_dict.get(config.pop('model').lower())(config)
+        except KeyError as e:
+            LOGGER.warn('%s not found in config item: lighting_controller', e)
+
+    def attach_device(self, device):
+        self._devices.append(device)
+        try:
+            LOGGER.warn(device.get_fan_speed())
+        except AttributeError:
+            pass
+
+    def start(self):
+        raise NotImplementedError
+
+    def stop(self):
+        return
+
+
+class CustomLightingEffect(LightingEffect):
+    SLOW = 1
+    NORMAL = 0.75
+    FAST = 0.5
+    EXTREME = 0.25
+
+    def __init__(self, config):
+        super().__init__(config)
+        conf_speed = self._config.get('speed', 'normal')
+        self._speed = getattr(self, conf_speed.upper())
+
+    def start(self):
+        raise NotImplementedError
+
+
+class ThreadedCustomLightingEffect(CustomLightingEffect):
+    def __init__(self, config):
+        super().__init__(config)
+        self._continue = False
+        self._thread = Thread(target=self._main_loop)
+
+    def start(self):
+        self._continue = True
+        self._thread.start()
+
+    def stop(self):
+        self._continue = False
+        self._thread.join()
 
     def begin_all(self):
         pass
+
+    def _main_loop(self):
+        self.begin_all()
+        while self._continue:
+            self.next()
+            time.sleep(self._speed)
 
     def next(self):
         raise NotImplementedError
 
 
-class StaticLightingEffect(LightingEffect):
-    def __init__(self, r: int, g: int, b: int):
-        self.r, self.g, self.b = r, g, b
+class AlternatingLightingEffect(CustomLightingEffect):
+    """
+    ::: settings: [odd_rgb:{r,g,b}, even_rgb:{r,g,b}]
+    """
+    model = 'alternating'
+    RGBMap = namedtuple('RGBMap', ['g', 'r', 'b'])
 
-    def next(self):
-        return self.g, self.r, self.b
+    def __init__(self, config):
+        super().__init__(config)
+        self.odd_rgb = self.RGBMap(**self._config.get('odd_rgb'))
+        self.even_rgb = self.RGBMap(**self._config.get('even_rgb'))
+        LOGGER.info(f'{self._config} {self.even_rgb} {self.odd_rgb}')
 
-    def __str__(self) -> str:
-        return f'static lighting {self.r},{self.b},{self.b}'
-
-
-class AlternatingLightingEffect(LightingEffect):
-    def __init__(self, even_rgb_matrix, odd_rgb_matrix):
-        self.even_r, self.even_g, self.even_b = even_rgb_matrix
-        self.odd_r, self.odd_g, self.odd_b = odd_rgb_matrix
-        self.odd = True
-
-    def next(self):
-        if self.odd:
-            self.odd = False
-            return self.odd_g, self.odd_r, self.odd_b
-        else:
-            self.odd = True
-            return self.even_g, self.even_r, self.even_b
+    def start(self):
+        for dev in self._devices:
+            values = []
+            for i in range(dev.num_leds):
+                if i % 2 == 0:
+                    values.extend(self.even_rgb)
+                else:
+                    values.extend(self.odd_rgb)
+            dev.set_lighting(values=values)
 
     def __str__(self) -> str:
-        return f'alternating lighting ' \
-               f'{self.even_r},{self.even_b},{self.even_b} / ' \
-               f'{self.odd_r},{self.odd_b},{self.odd_b}'
+        return f'alternating lighting {self.odd_rgb} {self.even_rgb}'
 
 
-class RGBSpectrumLightingEffect(LightingEffect):
-    def __init__(self):
-        self.num_iters = 0
-        self.compass_to_rgb_map = [compass_to_rgb(ang) for ang in range(360)]
+class TemperatureLightingEffect(ThreadedCustomLightingEffect):
+    """
+    ::: settings: [speed, cold, hot, target, sensor_name]
+    """
+    model = 'temperature'
 
-    def begin_dev(self):
-        self.num_iters = 0
+    cold_angle = 240
+    target_angle = 120
+    hot_angle = 0
 
-    def next(self):
-        self.num_iters += 1
-        return self.compass_to_rgb_map[int(360 / 12 * self.num_iters)]
-
-    def __str__(self) -> str:
-        return f'RGB spectrum'
-
-
-class SpinningRGBSpectrumLightingEffect(RGBSpectrumLightingEffect):
-    def __init__(self):
-        super().__init__()
-        self.rotation = 0
-
-    def begin_all(self):
-        if self.rotation > 11:
-            self.rotation = 0
-        self.rotation += 1
-
-    def next(self):
-        self.num_iters += 1
-        return compass_to_rgb((360 / 12 * self.num_iters) + 360 / 12 * self.rotation)
-
-    def __str__(self) -> str:
-        return f'spinning RGB spectrum'
-
-
-class TemperatureLightingEffect(LightingEffect):
-    def __init__(self, sensor_name, hot: int = 60, target: int = 30, cold: int = 20):
-        self.sensor_name = sensor_name
+    def __init__(self, config):
+        super().__init__(config)
+        self.sensor_name = self._config.get('sensor_name')
+        self.cold = int(self._config.get('cold', 20))
+        self.target = int(self._config.get('target', 30))
+        self.hot = int(self._config.get('hot', 60))
         self.cur_temp = 0
         self.angle = 0
 
-        self.cold = cold
-        self.target = target
-        self.hot = hot
+    def next(self):
+        def flatten(l):
+            return [item for sublist in l for item in sublist]
 
-        self.cold_angle = 240
-        self.target_angle = 120
-        self.hot_angle = 0
-
-    def begin_all(self):
-        print(self.angle)
         self.cur_temp = sensors_temperatures().get(self.sensor_name)[0].current
         if self.cur_temp <= self.cold:
             self.angle = self.cold_angle
@@ -160,80 +179,140 @@ class TemperatureLightingEffect(LightingEffect):
             self.angle = 120 - ((self.target_angle - self.hot_angle)
                                 / (self.hot - self.target)
                                 * (self.cur_temp - self.target))
-
-    def next(self):
-        return compass_to_rgb(self.angle)
+        for dev in self._devices:
+            values = flatten([compass_to_rgb(self.angle)] * dev.num_leds)
+            dev.set_lighting(values=values)
 
     def __str__(self) -> str:
         return f'temperature lighting'
 
 
-class LightingController:
-    def __init__(self, lighting_effect):
-        self.lighting_effect = lighting_effect
-        self.brightness_level = 100
-        self.update_msec = 100
-
-    def main(self, device) -> tuple:
-        """
-        returns a hex array to set the lights too
-        """
-        data = []
-        self.lighting_effect.begin_dev()
-        for i in range(device.num_leds):
-            data.extend(self._brightness_processor(self.lighting_effect.next()))
-        return data, self.update_msec
-
-    def _brightness_processor(self, rgb):
-        if self.brightness_level == 0:
-            return [0, 0, 0]
-        else:
-            return [int(i / 100 * self.brightness_level) for i in rgb]
-
-    def __str__(self) -> str:
-        return str(self.lighting_effect)
-
-
-class LightingManager:
-    def __init__(self, initial_controller: LightingController = None):
-        self._continue = False
-        self._thread = Thread(target=self._main_loop)
-        self._devices = []
-        self._controller = initial_controller
-
-    def attach_device(self, device):
-        self._devices.append(device)
-
-    def set_controller(self, controller: LightingController):
-        if isinstance(controller, LightingController):
-            self._controller = controller
-
-    def set_brightness(self, brightness: int):
-        if brightness < 0:
-            brightness = 0
-        elif brightness > 300:
-            brightness = 300
-        self._controller.brightness_level = int(brightness)
-
-    def set_light_update_msec(self, sec: int):
-        if sec > 0:
-            self._controller.update_msec = int(sec)
-
-    def _main_loop(self):
-        next_poll_msec = 1
-        while self._continue:
-            self._controller.lighting_effect.begin_all()
-            for dev in self._devices:
-                data, next_poll_msec = self._controller.main(dev)
-                dev.set_lighting(data)
-            time.sleep(next_poll_msec / 1000)
+class ThermaltakeLightingEffect(LightingEffect):
+    def __init__(self, config):
+        super().__init__(config)
+        conf_speed = self._config.get('speed', 'normal')
+        self._speed = getattr(RGB.Speed, conf_speed.upper())
 
     def start(self):
-        LOGGER.info(f'Starting lighting manager ({self._controller})...')
-        self._continue = True
-        self._thread.start()
+        raise NotImplementedError
 
-    def stop(self):
-        LOGGER.info(f'Stopping lighting manager...')
-        self._continue = False
-        self._thread.join()
+
+class FullLightingEffect(ThermaltakeLightingEffect):
+    """
+    ::: settings: [speed, r, g, b]
+    """
+    model = 'full'
+
+    def start(self):
+        values = []
+        try:
+            g, r, b = self._config['g'], self._config['r'], self._config['b']
+            for i in range(12):
+                values.extend([g, r, b])
+        except KeyError as e:
+            LOGGER.warn('%s not found in config item: lighting_controller', e)
+
+        for device in self._devices:
+            device.set_lighting(mode=RGB.Mode.FULL, speed=self._speed, values=values)
+
+
+class PerLEDLightingEffect(ThermaltakeLightingEffect):
+    # TODO: per-led config
+    # TODO: design a neat way to set this up via config (surely theres a better way then a massive array)
+    model = 'perLed'
+
+    def start(self):
+        raise NotImplementedError
+
+
+class FlowLightingEffect(ThermaltakeLightingEffect):
+    """
+    ::: settings: [speed]
+    """
+    model = 'flow'
+
+    def start(self):
+        for device in self._devices:
+            device.set_lighting(mode=RGB.Mode.FLOW, speed=self._speed)
+
+
+class SpectrumLightingEffect(ThermaltakeLightingEffect):
+    """
+    ::: settings: [speed]
+    """
+    model = 'spectrum'
+
+    def start(self):
+        for device in self._devices:
+            device.set_lighting(mode=RGB.Mode.SPECTRUM, speed=self._speed)
+
+
+class RippleLightingEffect(ThermaltakeLightingEffect):
+    """
+    ::: settings: [speed, r, g, b]
+    """
+    model = 'ripple'
+
+    def start(self):
+        try:
+            g, r, b = self._config['g'], self._config['r'], self._config['b']
+        except KeyError as e:
+            LOGGER.warn('%s not found in config item: lighting_controller', e)
+            return
+
+        for device in self._devices:
+            device.set_lighting(mode=RGB.Mode.RIPPLE, speed=self._speed, values=[g, r, b])
+
+
+class BlinkLightingEffect(ThermaltakeLightingEffect):
+    # TODO: per-led config
+    # TODO: design a neat way to set this up via config (surely theres a better way then a massive array)
+    """
+    ::: settings: [speed, r, g, b]
+    """
+    model = 'blink'
+
+    def start(self):
+        try:
+            g, r, b = self._config['g'], self._config['r'], self._config['b']
+        except KeyError as e:
+            LOGGER.warn('%s not found in config item: lighting_controller', e)
+            return
+
+        for device in self._devices:
+            values = []
+            for i in range(12):
+                values.extend([g, r, b])
+            device.set_lighting(mode=RGB.Mode.BLINK, speed=self._speed, values=values)
+
+
+class PulseLightingEffect(ThermaltakeLightingEffect):
+    # TODO: per-led config
+    # TODO: design a neat way to set this up via config (surely theres a better way then a massive array)
+    """
+    ::: settings: [speed, r, g, b]
+    """
+    model = 'pulse'
+
+    def start(self):
+        try:
+            g, r, b = self._config['g'], self._config['r'], self._config['b']
+        except KeyError as e:
+            LOGGER.warn('%s not found in config item: lighting_controller', e)
+            return
+
+        for device in self._devices:
+            values = []
+            for i in range(12):
+                values.extend([g, r, b])
+            device.set_lighting(mode=RGB.Mode.PULSE, speed=self._speed, values=values)
+
+
+class WaveLightingEffect(ThermaltakeLightingEffect):
+    # TODO: per-led config
+    # TODO: design a neat way to set this up via config (surely theres a better way then a massive array)
+    # 14=wave    requires values (spinning per led)
+    model = 'wave'
+
+    def start(self):
+        raise NotImplementedError
