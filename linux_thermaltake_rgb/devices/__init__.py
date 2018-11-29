@@ -20,23 +20,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from collections import namedtuple
 
 from linux_thermaltake_rgb import LOGGER
+from linux_thermaltake_rgb.classified_object import ClassifiedObject
 from linux_thermaltake_rgb.globals import PROTOCOL_SET, PROTOCOL_LIGHT, PROTOCOL_FAN, PROTOCOL_GET
-
-FLOE_RIING_RGB = 'Floe Riing RGB'
-RIING_PLUS = 'Riing Plus'
-PR22D5_PLUS = 'Pacific PR22-D5 Plus'
-W4_PLUS = 'Pacific W4 Plus CPU Waterblock'
-VGTX_1080_PLUS = 'Pacific V-GTX 1080Ti Plus GPU Waterblock'
-RAD_PLUS = 'Pacific Rad Plus LED Panel'
-LUMI_PLUS = 'Lumi Plus LED Strip'
 
 FanSpeed = namedtuple('FanSpeed', ['set_speed', 'rpm'])
 
 
-class ThermaltakeDevice:
+class ThermaltakeDevice(ClassifiedObject):
+    model = None
+
     def __init__(self, controller, port: int):
         self.port = int(port)
         self.controller = controller
+
+    @classmethod
+    def factory(cls, model, controller, port):
+        subclass_dict = {clazz.model.lower(): clazz for clazz in cls.inheritors() if clazz.model is not None}
+        try:
+            return subclass_dict[model.lower()](controller, port)
+        except KeyError:
+            LOGGER.warn(f'model {model} not found. controller: {controller} port: {port}')
 
 
 class ThermaltakeRGBDevice(ThermaltakeDevice):
@@ -71,4 +74,6 @@ class ThermaltakeFanDevice(ThermaltakeDevice):
         return FanSpeed(speed, (rpm_h << 8) + rpm_l)
 
 
-
+from linux_thermaltake_rgb.devices.pumps import *
+from linux_thermaltake_rgb.devices.fans import *
+from linux_thermaltake_rgb.devices.lights import *

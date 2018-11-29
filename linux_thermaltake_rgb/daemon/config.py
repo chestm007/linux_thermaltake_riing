@@ -41,9 +41,9 @@ class Config:
         with open('{}/{}'.format(self.config_dir, self.config_file_name)) as cfg:
             config = yaml.load(cfg)
             self.controllers = config.get('controllers')
-            LOGGER.info(config.get('controllers'))
+            LOGGER.debug(config.get('controllers'))
             # self.devices = config.get('devices')
-            LOGGER.info(config.get('fan_manager'))
+            LOGGER.debug(config.get('fan_manager'))
             self.fan_manager = config.get('fan_manager')
-            LOGGER.info(config.get('lighting_manager'))
+            LOGGER.debug(config.get('lighting_manager'))
             self.lighting_manager = config.get('lighting_manager')

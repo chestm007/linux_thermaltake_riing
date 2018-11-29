@@ -43,4 +43,3 @@ class RGB:
         NORMAL = 0x02
         FAST = 0x01
         EXTREME = 0x00
-

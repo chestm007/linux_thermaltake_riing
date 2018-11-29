@@ -24,6 +24,7 @@ from threading import Thread
 from psutil import sensors_temperatures
 
 from linux_thermaltake_rgb import LOGGER
+from linux_thermaltake_rgb.classified_object import ClassifiedObject
 from linux_thermaltake_rgb.globals import RGB
 import math
 
@@ -59,7 +60,7 @@ def compass_to_rgb(h, s=1, v=1):
     return g, r, b
 
 
-class LightingEffect:
+class LightingEffect(ClassifiedObject):
     model = None
 
     def __init__(self, config):
@@ -68,24 +69,12 @@ class LightingEffect:
         LOGGER.info(f'initializing {self.__class__.__name__} light controller')
 
     @classmethod
-    def inheritors(cls):
-        subclasses = set()
-        work = [cls]
-        while work:
-            parent = work.pop()
-            for child in parent.__subclasses__():
-                if child not in subclasses:
-                    subclasses.add(child)
-                    work.append(child)
-        return subclasses
-
-    @classmethod
     def factory(cls, config):
         subclass_dict = {clazz.model: clazz for clazz in cls.inheritors()}
         try:
             return subclass_dict.get(config.pop('model').lower())(config)
         except KeyError as e:
-            LOGGER.warn('%s not found in config item: lighting_controller', e)
+            LOGGER.warn('%s not found in config item', e)
 
     def attach_device(self, device):
         self._devices.append(device)

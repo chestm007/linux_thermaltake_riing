@@ -28,7 +28,7 @@ from linux_thermaltake_rgb.daemon.dbus_service.service import ThermaltakeDbusSer
 from linux_thermaltake_rgb.lighting_manager import LightingEffect
 from linux_thermaltake_rgb import devices
 from linux_thermaltake_rgb.fan_manager import FanManager
-from linux_thermaltake_rgb.devices import factory
+from linux_thermaltake_rgb.devices import ThermaltakeDevice
 
 
 class ThermaltakeDaemon:
@@ -46,10 +46,9 @@ class ThermaltakeDaemon:
         self.controllers = {}
 
         for controller in self.config.controllers:
-            LOGGER.debug(controller)
             self.controllers[controller['unit']] = controller_factory(controller['type'], controller['unit'])
-            for id, _type in controller['devices'].items():
-                dev = factory.device_factory(self.controllers[controller['unit']], id, _type)
+            for id, model in controller['devices'].items():
+                dev = ThermaltakeDevice.factory(model, self.controllers[controller['unit']], id)
                 self.controllers[controller['unit']].attach_device(id, dev)
                 self.register_attached_device(controller['unit'], id, dev)
 
@@ -63,7 +62,7 @@ class ThermaltakeDaemon:
         if isinstance(dev, devices.ThermaltakeRGBDevice):
             self.lighting_manager.attach_device(dev)
 
-        self.attached_devices[str(unit)+":"+str(port)] = dev
+        self.attached_devices[f'{unit}:{port}'] = dev
 
     def run(self):
         self._continue = True
