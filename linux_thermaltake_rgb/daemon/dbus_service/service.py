@@ -6,7 +6,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GObject
 
 from linux_thermaltake_rgb.fan_manager import fan_model_factory
-from linux_thermaltake_rgb.lighting_manager import lighting_model_factory
+from linux_thermaltake_rgb.lighting_manager import LightingEffect
 
 DBusGMainLoop(set_as_default=True)
 
@@ -38,7 +38,7 @@ class ThermaltakeDbusService(dbus.service.Object):
         if len(args) > 0:
             if args[0] in ('static', 'alternating', 'rgb_spectrum',
                            'spinning_rgb_spectrum', 'temperature'):
-                fc = lighting_model_factory(*args)
+                fc = LightingEffect.factory(*args)
                 self.daemon.lighting_manager.set_model(fc)
                 return "success"
         return "argument 0 must be in [static|alternating|rgb_spectrum]"

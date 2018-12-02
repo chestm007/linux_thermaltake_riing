@@ -23,13 +23,12 @@ from threading import Thread
 from linux_thermaltake_rgb import LOGGER
 from linux_thermaltake_rgb.controllers import controller_factory
 from linux_thermaltake_rgb.fan_manager import fan_model_factory
-from linux_thermaltake_rgb.lighting_manager import lighting_model_factory
 from linux_thermaltake_rgb.daemon.config import Config
 from linux_thermaltake_rgb.daemon.dbus_service.service import ThermaltakeDbusService
+from linux_thermaltake_rgb.lighting_manager import LightingEffect
 from linux_thermaltake_rgb import devices
 from linux_thermaltake_rgb.fan_manager import FanManager
-from linux_thermaltake_rgb.lighting_manager import LightingManager
-from linux_thermaltake_rgb.devices import factory
+from linux_thermaltake_rgb.devices import ThermaltakeDevice
 
 
 class ThermaltakeDaemon:
@@ -39,8 +38,7 @@ class ThermaltakeDaemon:
         fan_model = fan_model_factory(**self.config.fan_manager)
         self.fan_manager = FanManager(fan_model)
 
-        lighting_model = lighting_model_factory(**self.config.lighting_manager)
-        self.lighting_manager = LightingManager(lighting_model)
+        self.lighting_manager = LightingEffect.factory(self.config.lighting_manager)
 
         self.dbus_service = ThermaltakeDbusService(self)
 
@@ -48,10 +46,9 @@ class ThermaltakeDaemon:
         self.controllers = {}
 
         for controller in self.config.controllers:
-            LOGGER.info(controller)
             self.controllers[controller['unit']] = controller_factory(controller['type'], controller['unit'])
-            for id, _type in controller['devices'].items():
-                dev = factory.device_factory(self.controllers[controller['unit']], id, _type)
+            for id, model in controller['devices'].items():
+                dev = ThermaltakeDevice.factory(model, self.controllers[controller['unit']], id)
                 self.controllers[controller['unit']].attach_device(id, dev)
                 self.register_attached_device(controller['unit'], id, dev)
 
@@ -65,7 +62,7 @@ class ThermaltakeDaemon:
         if isinstance(dev, devices.ThermaltakeRGBDevice):
             self.lighting_manager.attach_device(dev)
 
-        self.attached_devices[str(unit)+":"+str(port)] = dev
+        self.attached_devices[f'{unit}:{port}'] = dev
 
     def run(self):
         self._continue = True

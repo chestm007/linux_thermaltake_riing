@@ -25,20 +25,25 @@ from linux_thermaltake_rgb import LOGGER
 
 
 class Config:
-    # config_dir = '/etc/linux_thermaltake_rgb'
-    config_dir = 'linux_thermaltake_rgb/assets'
+    abs_config_dir = '/etc/linux_thermaltake_rgb'
+    rel_config_dir = 'linux_thermaltake_rgb/assets'
     config_file_name = 'config.yml'
 
     def __init__(self):
-        if not os.path.isdir(self.config_dir):
-            os.mkdir(self.config_dir)
+        # if we have config in /etc, use it, otherwise try and use repository config file
+        if os.path.isdir(self.abs_config_dir):
+            if os.path.isfile(os.path.join(self.abs_config_dir, self.config_file_name)):
+                self.config_dir = self.abs_config_dir
+        elif os.path.isdir(self.rel_config_dir):
+            if os.path.isfile(os.path.join(self.rel_config_dir, self.config_file_name)):
+                self.config_dir = self.rel_config_dir
 
         with open('{}/{}'.format(self.config_dir, self.config_file_name)) as cfg:
             config = yaml.load(cfg)
             self.controllers = config.get('controllers')
-            LOGGER.info(config.get('controllers'))
+            LOGGER.debug(config.get('controllers'))
             # self.devices = config.get('devices')
-            LOGGER.info(config.get('fan_manager'))
+            LOGGER.debug(config.get('fan_manager'))
             self.fan_manager = config.get('fan_manager')
-            LOGGER.info(config.get('lighting_manager'))
+            LOGGER.debug(config.get('lighting_manager'))
             self.lighting_manager = config.get('lighting_manager')

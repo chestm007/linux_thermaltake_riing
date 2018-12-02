@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+
 import usb
 
 
@@ -67,7 +68,8 @@ class ThermaltakeG3ControllerDriver:
             custom_match=lambda e: usb.util.endpoint_direction(e.bEndpointAddress) == usb.util.ENDPOINT_IN)
         assert self.endpoint_in is not None
 
-        self.write_out([0xfe, 0x33])
+        # initialize/reset the device
+        self.init_controller()
 
     @staticmethod
     def _generate_data_array(length: int = 64, value: int = 0x00) -> list:
@@ -101,3 +103,9 @@ class ThermaltakeG3ControllerDriver:
 
     def read_in(self, length: int = 64) -> bytearray:
         return self.endpoint_in.read(length)
+
+    def init_controller(self):
+        self.write_out([0xfe, 0x33])
+
+    def save_profile(self):
+        self.write_out([0x32, 0x53])

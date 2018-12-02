@@ -21,5 +21,6 @@ from linux_thermaltake_rgb.devices import ThermaltakeRGBDevice, ThermaltakeFanDe
 
 
 class ThermaltakeRiingPlusFan(ThermaltakeRGBDevice, ThermaltakeFanDevice):
+    model = 'Riing Plus'
     num_leds = 12
     index_per_led = 3

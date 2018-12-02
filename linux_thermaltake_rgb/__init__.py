@@ -23,12 +23,3 @@ import os
 
 LOGGER = logging.getLogger(__name__)
 DEBUG = bool(os.environ.get('DEBUG', False))
-
-
-
-
-
-
-
-
-

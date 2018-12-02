@@ -19,7 +19,7 @@ setup(
     long_description=readme,
     install_requires=[
         "pyyaml",
-        "PyGObject",
+        "GObject",
         "dbus-python",
         "psutil",
         "pyusb"
