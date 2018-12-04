@@ -56,6 +56,12 @@ fan_manager:
   sensor_name: k10temp
   multiplier: 5
 
+#  model: curve
+#  points:
+#    - [0, 0]  # [temp(*C), speed(0-100%)]
+#    - [50, 30]
+#    - [70, 100]
+
 lighting_manager:
 # speed: normal
 
