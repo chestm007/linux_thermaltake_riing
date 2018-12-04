@@ -22,7 +22,10 @@ setup(
         "GObject",
         "dbus-python",
         "psutil",
-        "pyusb"
+        "pyusb",
+        "matplotlib",
+        "scipy",
+        "numpy"
     ],
     entry_points="""
         [console_scripts]

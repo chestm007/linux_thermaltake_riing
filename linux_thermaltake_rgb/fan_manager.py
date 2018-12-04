@@ -20,7 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import time
 from threading import Thread
 
+import numpy as np
 from psutil import sensors_temperatures
+from scipy.interpolate import pchip
+from matplotlib import pyplot
 
 from linux_thermaltake_rgb import LOGGER
 
@@ -30,6 +33,8 @@ def fan_model_factory(model=None, *args, **kwargs):
         return LockedSpeedModel(*args, **kwargs)
     elif model == 'temp_target':
         return TempTargetModel(*args, **kwargs)
+    elif model == 'curve':
+        return CurveModel(*args, **kwargs)
 
 
 class FanModel:
@@ -78,6 +83,56 @@ class LockedSpeedModel(FanModel):
 
     def __str__(self) -> str:
         return f'locked speed {self.speed}%'
+
+
+class CurveModel:
+    """
+    creates a fan curve based on user defined points
+    """
+    def __init__(self, points: list=None):
+        LOGGER.debug(f'curve fan points: {points}')
+        # ensure the curve starts at 0, 0
+        has_zero = False
+        for point in points:
+            if point[0] == 0:
+                has_zero = True
+
+        if not has_zero:
+            points.insert(0, [0, 0])
+
+        points.sort(key=lambda s: s[0])
+
+        temps = []
+        speeds = []
+        for set_ in points:
+            temps.append(set_[0])
+            speeds.append(set_[1])
+
+        self._array = []
+
+        # this involved alot of stack overflow and admittedly im not 100% sure how it works
+        # basically given a set of points it extrapolates that into a line consisting of one
+        # point per degree.
+        x = np.asarray(temps)
+        y = np.asarray(speeds)
+        pch = pchip(x, y)
+        xx = np.linspace(x[0], x[-1], x[-1])
+        line2d = pyplot.plot(xx, pch(xx), 'g-')
+        self.temps = line2d[0].get_xdata()
+        self.speeds = line2d[0].get_ydata()
+
+    def main(self, temp):
+        """
+        returns a speed for a given temperature
+        :param temp: int
+        :return:
+        """
+        if temp > len(self.speeds):
+            temp = len(self.speeds)
+        if temp <= 0:
+            temp = 1
+            LOGGER.debug(f'setting speed to {self.speeds[temp - 1]}')
+        return self.speeds[temp - 1]
 
 
 class FanManager:
