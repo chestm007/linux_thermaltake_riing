@@ -85,7 +85,7 @@ class LockedSpeedModel(FanModel):
         return f'locked speed {self.speed}%'
 
 
-class CurveModel:
+class CurveModel(FanModel):
     """
     creates a fan curve based on user defined points
     """
@@ -123,12 +123,12 @@ class CurveModel:
         self.temps = line2d[0].get_xdata()
         self.speeds = line2d[0].get_ydata()
 
-    def main(self, temp):
+    def main(self):
         """
         returns a speed for a given temperature
-        :param temp: int
         :return:
         """
+        temp = self._get_temp()
         if temp > len(self.speeds):
             temp = len(self.speeds)
         if temp <= 0:
