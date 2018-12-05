@@ -46,7 +46,7 @@ class FanModel:
 
 
 class TempTargetModel(FanModel):
-    def __init__(self, target, sensor_name, multiplier: int = 5):
+    def __init__(self, target, sensor_name, multiplier: int=5):
         self.sensor_name = sensor_name
         self.target = float(target)
         self.multiplier = multiplier
@@ -128,12 +128,11 @@ class CurveModel(FanModel):
         returns a speed for a given temperature
         :return:
         """
-        temp = self._get_temp()
+        temp = int(self._get_temp())
         if temp > len(self.speeds):
             temp = len(self.speeds)
         if temp <= 0:
             temp = 1
-        LOGGER.debug(f'setting speed to {self.speeds[temp - 1]}')
         return self.speeds[temp - 1]
 
     def _get_temp(self):
@@ -144,25 +143,31 @@ class CurveModel(FanModel):
 
 
 class FanManager:
-    def __init__(self, initial_model: FanModel = None):
+    def __init__(self, initial_model: FanModel=None):
         self._continue = False
         self._thread = Thread(target=self._main_loop)
         self._devices = []
         self._model = initial_model
+        LOGGER.debug(f'creating FanManager object: [model: {initial_model}]')
 
     def attach_device(self, device):
         self._devices.append(device)
 
     def set_controller(self, model: FanModel):
+        LOGGER.debug(f'setting fan model: {model.__class__.__name__}')
         if isinstance(model, FanModel):
+            LOGGER.debug(f'SUCCESS: set fan model: {model.__class__.__name__}')
             self._model = model
 
     def _main_loop(self):
+        LOGGER.debug(f'entering {self.__class__.__name__} main loop')
         while self._continue:
             speed = self._model.main()
+            LOGGER.debug(f'new fan speed {speed}')
             for dev in self._devices:
                 dev.set_fan_speed(speed)
-            time.sleep(5)
+            time.sleep(1)
+        LOGGER.debug(f'exiting {self.__class__.__name__} main loop')
 
     def start(self):
         LOGGER.info(f'Starting fan manager ({self._model})...')
