@@ -5,6 +5,8 @@ from setuptools import find_packages
 with open('README.md') as f:
     readme = f.read()
 
+
+DATA_FILE_LOCATION = '/usr/share/linux_thermaltake_rgb'
 setup(
     name='linux_thermaltake_rgb',
     version='PROJECTVERSION',
@@ -31,7 +33,7 @@ setup(
         [console_scripts]
         linux-thermaltake-rgb=linux_thermaltake_rgb.daemon.main:main
     """,
-    data_files=[('/etc/udev/rules.d', ['linux_thermaltake_rgb/assets/90-linux_thermaltake_rgb.rules']),
-                ('/usr/lib/systemd/user', ['linux_thermaltake_rgb/assets/linux-thermaltake-rgb.service']),
-                ('/etc/linux_thermaltake_rgb', ['linux_thermaltake_rgb/assets/config.yml'])]
+    data_files=[(DATA_FILE_LOCATION, ['linux_thermaltake_rgb/assets/90-linux_thermaltake_rgb.rules']),
+                (DATA_FILE_LOCATION, ['linux_thermaltake_rgb/assets/linux-thermaltake-rgb.service']),
+                (DATA_FILE_LOCATION, ['linux_thermaltake_rgb/assets/config.yml'])]
 )
