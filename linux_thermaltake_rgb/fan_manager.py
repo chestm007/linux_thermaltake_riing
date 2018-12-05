@@ -90,17 +90,18 @@ class CurveModel:
     creates a fan curve based on user defined points
     """
     def __init__(self, points: list=None):
-        LOGGER.debug(f'curve fan points: {points}')
+        self.points = points
+        LOGGER.debug(f'curve fan points: {self.points}')
         # ensure the curve starts at 0, 0
         has_zero = False
-        for point in points:
+        for point in self.points:
             if point[0] == 0:
                 has_zero = True
 
         if not has_zero:
-            points.insert(0, [0, 0])
+            self.points.insert(0, [0, 0])
 
-        points.sort(key=lambda s: s[0])
+        self.points.sort(key=lambda s: s[0])
 
         temps = []
         speeds = []
@@ -133,6 +134,9 @@ class CurveModel:
             temp = 1
             LOGGER.debug(f'setting speed to {self.speeds[temp - 1]}')
         return self.speeds[temp - 1]
+
+    def __str__(self) -> str:
+        return f'curve {self.points}'
 
 
 class FanManager:
