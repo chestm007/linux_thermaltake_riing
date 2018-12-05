@@ -133,7 +133,7 @@ class CurveModel(FanModel):
             temp = len(self.speeds)
         if temp <= 0:
             temp = 1
-            LOGGER.debug(f'setting speed to {self.speeds[temp - 1]}')
+        LOGGER.debug(f'setting speed to {self.speeds[temp - 1]}')
         return self.speeds[temp - 1]
 
     def _get_temp(self):
