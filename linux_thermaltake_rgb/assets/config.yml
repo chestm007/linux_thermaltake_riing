@@ -48,19 +48,20 @@ controllers:
 #      5: Lumi Plus LED Strip
 
 fan_manager:
-#  model: locked_speed
-#  speed: 50
+  model: locked_speed
+  speed: 50
 
-  model: temp_target
-  target: 38
-  sensor_name: k10temp
-  multiplier: 5
+#  model: temp_target
+#  target: 38
+#  sensor_name: k10temp
+#  multiplier: 5
 
 #  model: curve
 #  points:
 #    - [0, 0]  # [temp(*C), speed(0-100%)]
 #    - [50, 30]
 #    - [70, 100]
+#  sensor_name: k10temp
 
 lighting_manager:
 # speed: normal
