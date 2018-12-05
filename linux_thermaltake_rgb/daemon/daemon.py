@@ -22,7 +22,7 @@ from threading import Thread
 
 from linux_thermaltake_rgb import LOGGER
 from linux_thermaltake_rgb.controllers import controller_factory
-from linux_thermaltake_rgb.fan_manager import fan_model_factory
+from linux_thermaltake_rgb.fan_manager import FanModel
 from linux_thermaltake_rgb.daemon.config import Config
 from linux_thermaltake_rgb.daemon.dbus_service.service import ThermaltakeDbusService
 from linux_thermaltake_rgb.lighting_manager import LightingEffect
@@ -35,7 +35,7 @@ class ThermaltakeDaemon:
     def __init__(self):
         self.config = Config()
 
-        fan_model = fan_model_factory(**self.config.fan_manager)
+        fan_model = FanModel.factory(self.config.fan_manager)
         self.fan_manager = FanManager(fan_model)
 
         self.lighting_manager = LightingEffect.factory(self.config.lighting_manager)

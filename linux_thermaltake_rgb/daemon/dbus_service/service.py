@@ -5,7 +5,7 @@ import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GObject
 
-from linux_thermaltake_rgb.fan_manager import fan_model_factory
+from linux_thermaltake_rgb.fan_manager import FanModel
 from linux_thermaltake_rgb.lighting_manager import LightingEffect
 
 DBusGMainLoop(set_as_default=True)
@@ -28,7 +28,7 @@ class ThermaltakeDbusService(dbus.service.Object):
     def set_fan_controller(self, *args):
         if len(args) > 0:
             if args[0] in ('locked_speed', 'temp_target'):
-                fc = fan_model_factory(*args)
+                fc = FanModel.factory(*args)
                 self.daemon.fan_manager.set_model(fc)
                 return "success"
         return "argument 0 must be in [locked_speed|temp_target]"

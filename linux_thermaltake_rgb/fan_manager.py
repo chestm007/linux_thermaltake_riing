@@ -26,18 +26,18 @@ from scipy.interpolate import pchip
 from matplotlib import pyplot
 
 from linux_thermaltake_rgb import LOGGER
+from linux_thermaltake_rgb.classified_object import ClassifiedObject
 
 
-def fan_model_factory(model=None, *args, **kwargs):
-    if model == 'locked_speed':
-        return LockedSpeedModel(*args, **kwargs)
-    elif model == 'temp_target':
-        return TempTargetModel(*args, **kwargs)
-    elif model == 'curve':
-        return CurveModel(*args, **kwargs)
+class FanModel(ClassifiedObject):
+    @classmethod
+    def factory(cls, config):
+        subclass_dict = {clazz.model: clazz for clazz in cls.inheritors()}
+        try:
+            return subclass_dict.get(config.pop('model').lower())(config)
+        except KeyError as e:
+            LOGGER.warn('%s not found in config item', e)
 
-
-class FanModel:
     def main(self):
         """
         returns an integer between 0 and 100 to set the fan speed too
@@ -46,10 +46,12 @@ class FanModel:
 
 
 class TempTargetModel(FanModel):
-    def __init__(self, target, sensor_name, multiplier: int=5):
-        self.sensor_name = sensor_name
-        self.target = float(target)
-        self.multiplier = multiplier
+    model = 'temp_target'
+
+    def __init__(self, config):
+        self.sensor_name = config.get('sensor_name')
+        self.target = float(config.get('target'))
+        self.multiplier = config.get('multiplier')
         self.last_speed = 10
 
     def main(self):
@@ -72,7 +74,10 @@ class TempTargetModel(FanModel):
 
 
 class LockedSpeedModel(FanModel):
-    def __init__(self, speed):
+    model = 'locked_speed'
+
+    def __init__(self, config):
+        speed = config.get('speed')
         if not 0 <= speed <= 100:
             raise ValueError(f'Speed must be between 0 and 100, got {speed}')
         self.speed = speed
@@ -89,9 +94,11 @@ class CurveModel(FanModel):
     """
     creates a fan curve based on user defined points
     """
-    def __init__(self, points, sensor_name):
-        self.points = points
-        self.sensor_name = sensor_name
+    model = 'curve'
+
+    def __init__(self, config):
+        self.points = config.get('points')
+        self.sensor_name = config.get('sensor_name')
         LOGGER.debug(f'curve fan points: {self.points}')
         # ensure the curve starts at 0, 0
         has_zero = False
@@ -106,7 +113,7 @@ class CurveModel(FanModel):
 
         temps = []
         speeds = []
-        for set_ in points:
+        for set_ in self.points:
             temps.append(set_[0])
             speeds.append(set_[1])
 
