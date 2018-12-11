@@ -23,6 +23,8 @@ from threading import Thread
 import numpy as np
 from psutil import sensors_temperatures
 from scipy.interpolate import pchip
+import matplotlib
+matplotlib.use('agg')
 from matplotlib import pyplot
 
 from linux_thermaltake_rgb import LOGGER

@@ -232,7 +232,7 @@ class FullLightingEffect(ThermaltakeLightingEffect):
 class PerLEDLightingEffect(ThermaltakeLightingEffect):
     # TODO: per-led config
     # TODO: design a neat way to set this up via config (surely theres a better way then a massive array)
-    model = 'perLed'
+    model = 'perled'
 
     def start(self):
         raise NotImplementedError
