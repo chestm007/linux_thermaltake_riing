@@ -77,6 +77,8 @@ class ThermaltakeDaemon:
         self.fan_manager.stop()
         self._thread.join()
         self.dbus_service.stop()
+        for controller in self.controllers.values():
+            controller.save_profile()
 
     def _main_loop(self):
         while self._continue:
