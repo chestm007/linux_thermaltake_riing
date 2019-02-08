@@ -24,7 +24,6 @@ from linux_thermaltake_rgb import LOGGER
 from linux_thermaltake_rgb.controllers import controller_factory
 from linux_thermaltake_rgb.fan_manager import FanModel
 from linux_thermaltake_rgb.daemon.config import Config
-from linux_thermaltake_rgb.daemon.dbus_service.service import ThermaltakeDbusService
 from linux_thermaltake_rgb.lighting_manager import LightingEffect
 from linux_thermaltake_rgb import devices
 from linux_thermaltake_rgb.fan_manager import FanManager
@@ -39,8 +38,6 @@ class ThermaltakeDaemon:
         self.fan_manager = FanManager(fan_model)
 
         self.lighting_manager = LightingEffect.factory(self.config.lighting_manager)
-
-        self.dbus_service = ThermaltakeDbusService(self)
 
         self.attached_devices = {}
         self.controllers = {}
@@ -69,14 +66,13 @@ class ThermaltakeDaemon:
         self._thread.start()
         self.lighting_manager.start()
         self.fan_manager.start()
-        self.dbus_service.start()
 
     def stop(self):
         self._continue = False
         self.lighting_manager.stop()
         self.fan_manager.stop()
         self._thread.join()
-        self.dbus_service.stop()
+        LOGGER.debug('saving controller profiles')
         for controller in self.controllers.values():
             controller.save_profile()
 
