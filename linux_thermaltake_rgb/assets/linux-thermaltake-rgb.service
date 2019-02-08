@@ -3,7 +3,7 @@ AssertPathExists=/etc/linux_thermaltake_rgb/config.yml
 
 [Service]
 WorkingDirectory=/
-ExecStart=/usr/bin/linux-thermaltake-rgb
+ExecStart=/bin/bash -c 'linux-thermaltake-rgb'
 Restart=always
 PrivateTmp=true
 NoNewPrivileges=true
