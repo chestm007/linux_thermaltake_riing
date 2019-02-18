@@ -109,3 +109,7 @@ class ThermaltakeG3ControllerDriver:
 
     def save_profile(self):
         self.write_out([0x32, 0x53])
+
+
+class ThermaltakeRiingTrioControllerDriver(ThermaltakeG3ControllerDriver):
+    PRODUCT_ID_BASE = 0x2135
