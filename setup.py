@@ -22,7 +22,6 @@ setup(
     install_requires=[
         "pyyaml",
         "GObject",
-        "dbus-python",
         "psutil",
         "pyusb",
         "matplotlib",
