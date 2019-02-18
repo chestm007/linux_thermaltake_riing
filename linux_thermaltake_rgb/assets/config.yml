@@ -14,6 +14,13 @@ controllers:
       3: Riing Plus
       4: Riing Plus
       5: Floe Riing RGB
+#  - unit: 1
+#    type: riingtrio
+#    devices:
+#      1: Riing Plus  # These are incorrectly specified as Riing Plus
+#      2: Riing Plus  # there is nothing in the code that will break this
+#      3: Riing Plus  # but we should not be doing confusing things like this
+#                     # TODO: implement better fan naming schemes
 #  - unit: 2
 #    type: g3
 #    devices:

@@ -35,6 +35,6 @@ class ThermaltakeRiingTrioController(ThermaltakeController):
 def controller_factory(unit_type=None, unit=1, **kwargs) -> ThermaltakeController:
     if unit_type.lower() == 'g3':
         return ThermaltakeG3Controller(unit)
-    
+
     elif unit_type.lower() == 'riingtrio':
         return ThermaltakeRiingTrioController(unit)
