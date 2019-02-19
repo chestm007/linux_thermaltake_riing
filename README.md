@@ -29,10 +29,11 @@ sudo cp /usr/share/linux_thermaltake_rgb/90-linux_thermaltake_rgb.rules /etc/ude
 sudo cp /usr/share/linux_thermaltake_rgb/linux-thermaltake-rgb.service /usr/lib/systemd/user/
 
 # and if this is a fresh install copy the default config file:
+sudo mkdir /etc/linux_thermaltake_rgb/
 sudo cp /usr/share/linux_thermaltake_rgb/config.yml /etc/linux_thermaltake_rgb/
 ```
 
-then add your user to the `plugdev` group - `sudo usermod -a -G plugdev <user>`  
+then add your user to the `plugdev` group - `sudo usermod -a -G plugdev $USER`  
 
 then reconnect your device.  
   note: you may need to log out and back in so your user is recognised as being in the `plugdev` group  
