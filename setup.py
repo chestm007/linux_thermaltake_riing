@@ -24,8 +24,6 @@ setup(
         "GObject",
         "psutil",
         "pyusb",
-        "matplotlib",
-        "scipy",
         "numpy"
     ],
     entry_points="""
