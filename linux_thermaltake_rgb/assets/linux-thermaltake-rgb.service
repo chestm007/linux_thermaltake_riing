@@ -2,11 +2,32 @@
 AssertPathExists=/etc/linux_thermaltake_rgb/config.yml
 
 [Service]
-WorkingDirectory=/
-ExecStart=/bin/bash -c 'linux-thermaltake-rgb'
+EnvironmentFile=-/etc/default/linux-thermaltake-rgb
+
+ExecStart=/usr/bin/linux-thermaltake-rgb
+
 Restart=always
-PrivateTmp=true
-NoNewPrivileges=true
+RestartSec=5s
+
+CapabilityBoundingSet=
+NoNewPrivileges=yes
+PrivateUsers=true
+PrivateTmp=yes
+PrivateDevices=no
+DevicePolicy=closed
+DeviceAllow=char-usb_device
+ProtectSystem=strict
+ProtectHome=true
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictAddressFamilies=
+RestrictRealtime=yes
+RestrictNamespaces=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
 
 [Install]
 WantedBy=default.target
