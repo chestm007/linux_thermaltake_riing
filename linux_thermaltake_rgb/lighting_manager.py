@@ -229,6 +229,23 @@ class FullLightingEffect(ThermaltakeLightingEffect):
             device.set_lighting(mode=RGB.Mode.FULL, speed=0x00, values=values)
 
 
+class OffLightingEffect(ThermaltakeLightingEffect):
+    """
+    Turns off all LEDs.
+
+    Example config:
+    >>> lighting_manager:
+    >>>   model: 'off'
+
+    ::: settings: []
+    """
+    model = 'off'
+
+    def start(self):
+        for device in self._devices:
+            device.set_lighting(mode=RGB.Mode.FULL, speed=0x00, values=[0] * 3 * 12)
+
+
 class PerLEDLightingEffect(ThermaltakeLightingEffect):
     # TODO: per-led config
     # TODO: design a neat way to set this up via config (surely theres a better way then a massive array)
