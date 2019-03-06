@@ -143,11 +143,14 @@ class FanManager:
 
     def _main_loop(self):
         LOGGER.debug(f'entering {self.__class__.__name__} main loop')
+        last_speed = None
         while self._continue:
-            speed = self._model.main()
-            LOGGER.debug(f'new fan speed {speed}')
-            for dev in self._devices:
-                dev.set_fan_speed(speed)
+            speed = int(round(self._model.main()))
+            if last_speed != speed:
+                last_speed = speed
+                LOGGER.debug(f'new fan speed {speed}')
+                for dev in self._devices:
+                    dev.set_fan_speed(speed)
             time.sleep(1)
         LOGGER.debug(f'exiting {self.__class__.__name__} main loop')
 
