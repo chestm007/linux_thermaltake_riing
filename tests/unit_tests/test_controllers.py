@@ -19,27 +19,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 from mock import patch
 
+from linux_thermaltake_rgb.controllers import ThermaltakeController
 from base_test_object import BaseTestObject
-from linux_thermaltake_rgb.fan_manager import FanModel, TempTargetModel, CurveModel
-
-TempTargetModel._get_temp = (lambda self: 50)
-CurveModel._get_temp = (lambda self: 50)
 
 
-class FanTest(BaseTestObject):
+class ControllerTest(BaseTestObject):
 
     @patch('linux_thermaltake_rgb.drivers.ThermaltakeControllerDriver._initialize_device', autospec=True)
-    def test_fan_factory(self, init_dev):
-
-        for clazz in FanModel.inheritors():
-            if clazz.model is None:
-                continue
-
-            fan = FanModel.factory({'model': clazz.model,
-                                    'points': [[50, 50]],  # curve
-                                    'speed': 50,  # locked_speed
-                                    'target': 50,  # temp_target
-                                    'multiplier': 10
-                                    })
-            fan.main()
-            self.assertIsInstance(fan, FanModel)
+    def test_controller_factory(self, init_dev):
+        for type_ in ('g3', ):
+            for case_variant in (str.lower, str.upper, str):
+                self.assertIsInstance(ThermaltakeController.factory(case_variant(type_)),
+                                      ThermaltakeController,
+                                      '{} not recognized'.format(type_))
+                self.assertTrue(init_dev.called, '{} did not initialize the driver'.format(type_))

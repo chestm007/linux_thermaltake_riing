@@ -20,16 +20,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import usb
 
+from linux_thermaltake_rgb import LOGGER
 
-class ThermaltakeG3ControllerDriver:
+
+class ThermaltakeControllerDriver:
     VENDOR_ID = 0x264a
-    PRODUCT_ID_BASE = 0x1fa5
 
-    def __init__(self, unit=1):
+    def __init__(self, *args, **kwargs):
         self.vendor_id = self.VENDOR_ID
-        self.product_id = self.PRODUCT_ID_BASE + (unit - 1)
+        self.product_id = None
+        self.init(*args, **kwargs)
 
         self._initialize_device()
+
+    def init(self, *args, **kwargs):
+        raise NotImplementedError
 
     def _initialize_device(self):
         self.device = usb.core.find(idVendor=self.vendor_id,
@@ -45,8 +50,8 @@ class ThermaltakeG3ControllerDriver:
         # 'Resource Busy' error.
         try:
             self.device.detach_kernel_driver(0)
-        except Exception as e:
-            pass  # already unregistered
+        except Exception:
+            LOGGER.warning('kernel driver already detached')
 
         self.device.set_configuration()
 
@@ -54,7 +59,8 @@ class ThermaltakeG3ControllerDriver:
         try:
             usb.util.claim_interface(self.device, 0)
         except usb.core.USBError as e:
-            raise
+            LOGGER.error('{} while claiming interface for device'.format(e))
+            raise e
 
         self.cfg = self.device.get_active_configuration()
         self.interface = self.cfg[(0, 0)]
@@ -71,12 +77,15 @@ class ThermaltakeG3ControllerDriver:
         # initialize/reset the device
         self.init_controller()
 
+    def init_controller(self):
+        raise NotImplementedError()
+
     @staticmethod
     def _generate_data_array(length: int = 64, value: int = 0x00) -> list:
         """
         helper function to generate a zeroed out array of length size
         """
-        return [value for i in range(length)]
+        return [value for _ in range(length)]
 
     def _populate_partial_data_array(self, in_array: list, length=64) -> list:
         """
@@ -104,11 +113,18 @@ class ThermaltakeG3ControllerDriver:
     def read_in(self, length: int = 64) -> bytearray:
         return self.endpoint_in.read(length)
 
-    def init_controller(self):
-        self.write_out([0xfe, 0x33])
-
     def save_profile(self):
         self.write_out([0x32, 0x53])
+
+
+class ThermaltakeG3ControllerDriver(ThermaltakeControllerDriver):
+    PRODUCT_ID_BASE = 0x1fa5
+
+    def init(self, unit=1):
+        self.product_id = self.PRODUCT_ID_BASE + (unit - 1)
+
+    def init_controller(self):
+        self.write_out([0xfe, 0x33])
 
 
 class ThermaltakeRiingTrioControllerDriver(ThermaltakeG3ControllerDriver):

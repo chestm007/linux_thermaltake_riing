@@ -34,10 +34,12 @@ class ThermaltakeDevice(ClassifiedObject):
         self.controller = controller
 
     @classmethod
-    def factory(cls, model, controller, port):
+    def factory(cls, model, controller=None, port=None):
         subclass_dict = {clazz.model.lower(): clazz for clazz in cls.inheritors() if clazz.model is not None}
         try:
-            return subclass_dict[model.lower()](controller, port)
+            dev = subclass_dict[model.lower()](controller, port)
+            LOGGER.debug('created {} device'.format(dev.__class__.__name__))
+            return dev
         except KeyError:
             LOGGER.warn(f'model {model} not found. controller: {controller} port: {port}')
 
@@ -58,7 +60,7 @@ class ThermaltakeRGBDevice(ThermaltakeDevice):
         data = [PROTOCOL_SET, PROTOCOL_LIGHT, self.port, mode + speed]
         if values:
             data.extend(values)
-        LOGGER.debug(data)
+        LOGGER.debug('{} set lighting: raw hex: {}'.format(self.__class__.__name__, data))
         self.controller.driver.write_out(data)
 
 

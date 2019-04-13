@@ -30,6 +30,10 @@ class Config:
     config_file_name = 'config.yml'
 
     def __init__(self):
+        self.controllers = None
+        self.fan_manager = None
+        self.lighting_manager = None
+
         # if we have config in /etc, use it, otherwise try and use repository config file
         if os.path.isdir(self.abs_config_dir):
             if os.path.isfile(os.path.join(self.abs_config_dir, self.config_file_name)):
@@ -37,9 +41,26 @@ class Config:
         elif os.path.isdir(self.rel_config_dir):
             if os.path.isfile(os.path.join(self.rel_config_dir, self.config_file_name)):
                 self.config_dir = self.rel_config_dir
+        else:
+            raise Exception('no config file found')
 
+        config = self.load_config()
+        self.parse_config(config)
+
+    def load_config(self):
         with open('{}/{}'.format(self.config_dir, self.config_file_name)) as cfg:
-            config = yaml.load(cfg)
+            cfg_str = cfg.readlines()
+        cfg_lines = []
+        for s in cfg_str:
+            # remove comments and blank lines
+            if not s.strip().startswith('#') and len(s) > 1:
+                cfg_lines.append(s)
+
+        cfg = ''.join(cfg_lines)
+        LOGGER.debug('raw config file\n** start **\n\n%s\n** end **\n', cfg)
+        return yaml.load(cfg)
+
+    def parse_config(self, config):
             self.controllers = config.get('controllers')
             LOGGER.debug(config.get('controllers'))
             # self.devices = config.get('devices')
