@@ -33,6 +33,7 @@ class Config:
         self.controllers = None
         self.fan_manager = None
         self.lighting_manager = None
+        self.psus = None
 
         # if we have config in /etc, use it, otherwise try and use repository config file
         if os.path.isdir(self.abs_config_dir):
@@ -68,3 +69,5 @@ class Config:
             self.fan_manager = config.get('fan_manager')
             LOGGER.debug(config.get('lighting_manager'))
             self.lighting_manager = config.get('lighting_manager')
+            LOGGER.debug(config.get('psus'))
+            self.psus = config.get('psus')

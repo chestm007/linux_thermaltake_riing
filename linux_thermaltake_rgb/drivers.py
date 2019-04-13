@@ -127,5 +127,15 @@ class ThermaltakeG3ControllerDriver(ThermaltakeControllerDriver):
         self.write_out([0xfe, 0x33])
 
 
+class ThermaltakeiRGBPLUSControllerDriver(ThermaltakeControllerDriver):
+    PRODUCT_ID = 0x2329
+
+    def init(self):
+        self.product_id = self.PRODUCT_ID
+
+    def init_controller(self):
+        self.write_out([0xfe, 0x31])
+
+
 class ThermaltakeRiingTrioControllerDriver(ThermaltakeG3ControllerDriver):
     PRODUCT_ID_BASE = 0x2135

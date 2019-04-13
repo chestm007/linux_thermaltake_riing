@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+import os
 
 import yaml
 from mock import patch
@@ -24,6 +25,8 @@ from mock import patch
 from base_test_object import BaseTestObject
 from linux_thermaltake_rgb.controllers import ThermaltakeController
 from linux_thermaltake_rgb.daemon.config import Config
+from linux_thermaltake_rgb.devices import ThermaltakeDevice
+from linux_thermaltake_rgb.devices.psus import ThermaltakePSUDevice
 
 
 class ConfigTest(BaseTestObject):
@@ -63,11 +66,33 @@ class ConfigTest(BaseTestObject):
             ThermaltakeController.factory(controller.get('type'))
             self.assertTrue(init_dev.called)
 
+    def load_irgbplus_config(self):
+        return self.load_config_from_string(IRGBPLUS_CONFIG)
+
+    @patch('linux_thermaltake_rgb.drivers.ThermaltakeControllerDriver._initialize_device', autospec=True)
+    def test_irgbplus_config(self, init_dev):
+
+        config = self.load_irgbplus_config()
+        for psu in config.psus:
+            self.assertEqual(psu.get('type'), 'irgbplus')
+
+            dev = ThermaltakeDevice.factory(psu.get('type'))
+            self.assertIsInstance(dev, ThermaltakePSUDevice)
+            self.assertTrue(init_dev.called)
+
     @patch('linux_thermaltake_rgb.drivers.ThermaltakeControllerDriver._initialize_device', autospec=True)
     def test_full_config(self, init_dev):
-        config = self.load_config_from_string(G3_CONFIG)
+        config = self.load_config_from_string(G3_CONFIG + IRGBPLUS_CONFIG)
         self.assertIsNotNone(config.controllers)
+        self.assertIsNotNone(config.psus)
 
+        self.assertEqual(config.psus[0]['type'], 'irgbplus')
+
+
+IRGBPLUS_CONFIG = """
+psus:
+  - type: irgbplus
+"""
 
 G3_CONFIG = """
 controllers:

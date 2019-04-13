@@ -26,6 +26,7 @@ from mock import patch
 from base_test_object import BaseTestObject
 from linux_thermaltake_rgb import LOGGER
 from linux_thermaltake_rgb.daemon.daemon import ThermaltakeDaemon, Config
+from linux_thermaltake_rgb.devices.psus import ThermaltakePSUDevice
 
 
 class DaemonMockIntegrationTest(BaseTestObject):
@@ -49,10 +50,12 @@ class DaemonMockIntegrationTest(BaseTestObject):
         self.assertIsNotNone(daemon)
         self.assertIsNotNone(daemon.config.controllers)
         self.assertTrue(init_dev.called)
+        for psu in daemon.psus:
+            self.assertIsInstance(psu, ThermaltakePSUDevice)
 
         logging_output = stream.getvalue()
         print(logging_output)
-        for keyword in ('** start **', '** end **'):
+        for keyword in ('ThermaltakePSUDevice', '** start **', '** end **'):
             self.assertIn(keyword, logging_output)
 
     def tearDown(self):

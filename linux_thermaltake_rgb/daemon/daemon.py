@@ -54,6 +54,15 @@ class ThermaltakeDaemon:
                 dev = ThermaltakeDevice.factory(model, self.controllers[controller['unit']], id)
                 self.controllers[controller['unit']].attach_device(id, dev)
                 self.register_attached_device(controller['unit'], id, dev)
+        self.psus = []
+
+        if self.config.psus is not None:
+            LOGGER.debug('configuring PSUs')
+            for i, psu in enumerate(self.config.psus):
+                LOGGER.debug('configuring PSU %s', psu.get('type'))
+                dev = ThermaltakeDevice.factory(psu.get('type'))
+                self.psus.append(dev)
+                self.register_attached_device('psu', i, dev)
 
         self._thread = Thread(target=self._main_loop)
         self._continue = False

@@ -79,3 +79,4 @@ class ThermaltakeFanDevice(ThermaltakeDevice):
 from linux_thermaltake_rgb.devices.pumps import *
 from linux_thermaltake_rgb.devices.fans import *
 from linux_thermaltake_rgb.devices.lights import *
+from linux_thermaltake_rgb.devices.psus import *

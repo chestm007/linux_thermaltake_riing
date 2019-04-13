@@ -17,29 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-from enum import Enum
-
-PROTOCOL_GET = 0x33
-PROTOCOL_SET = 0x32
-
-PROTOCOL_FAN = 0x51
-PROTOCOL_LIGHT = 0x52
+from linux_thermaltake_rgb import LOGGER
+from linux_thermaltake_rgb.devices import ThermaltakeRGBDevice
+from linux_thermaltake_rgb.drivers import ThermaltakeiRGBPLUSControllerDriver
 
 
-# credit: https://github.com/devcompl/riingplusapi
-class RGB:
-    class Mode:
-        FLOW = 0x00
-        SPECTRUM = 0x04
-        RIPPLE = 0x08
-        BLINK = 0x0c
-        PULSE = 0x10
-        WAVE = 0x14
-        BY_LED = 0x18
-        FULL = 0x19
+class ThermaltakePSUDevice(ThermaltakeRGBDevice):
+    model = 'iRGBPlus'
+    num_leds = 12
+    index_per_led = 3
 
-    class Speed:
-        SLOW = 0x03
-        NORMAL = 0x02
-        FAST = 0x01
-        EXTREME = 0x00
+    def __init__(self, controller=None, port=None):
+        self.driver = ThermaltakeiRGBPLUSControllerDriver()
+
+    def set_lighting(self, values: list = None, mode=0x18, speed=0x00):
+        data = [0x30, 0x42, mode]
+        if values:
+            data.extend(values)
+        LOGGER.debug('{} set lighting: raw hex: {}'.format(self.__class__.__name__, data))
+        self.driver.write_out(data)
