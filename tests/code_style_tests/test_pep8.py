@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+import unittest
+
 import pep8
 import os
 import os.path
 
-from base_test_object import BaseTestObject
 
-
-class TestCodeFormat(BaseTestObject):
+class TestCodeFormat(unittest.TestCase):
     def test_pep8(self):
         """
         verify our codebase complies with code style guidelines

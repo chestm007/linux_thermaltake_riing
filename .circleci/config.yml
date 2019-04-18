@@ -1,0 +1,45 @@
+default_steps: &default_steps
+  steps:
+    - checkout
+    - run:
+        name: install dependencies
+        command: |
+          sudo apt-get update
+          sudo apt-get install -y python3-gi python3-dbus
+          sudo apt-get install -y virtualenv
+          sudo apt-get install -y build-essential
+          sudo apt-get install -y python3-dev
+          sudo apt-get install -y libdbus-glib-1-dev
+          sudo apt-get install -y libgirepository1.0-dev
+          sudo apt-get install -y libcairo2-dev
+          python -m venv venv
+          sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
+          sudo chmod -R a+rwx /usr/share
+          . venv/bin/activate
+          pip install .
+    - run:
+        name: run tests
+        command: |
+          . venv/bin/activate
+          pip install pytest mock pep8
+          python -m pytest
+
+version: 2
+jobs:
+  python3.6:
+    docker:
+      - image: circleci/python:3.6.8-stretch
+    working_directory: ~/repo
+    <<: *default_steps
+  python3.7:
+    docker:
+      - image: circleci/python:3.7.3-stretch
+    working_directory: ~/repo
+    <<: *default_steps
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - python3.6
+      - python3.7
