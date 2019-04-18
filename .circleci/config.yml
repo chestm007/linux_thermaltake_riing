@@ -68,6 +68,3 @@ workflows:
           requires:
             - python3.6
             - python3.7
-          filters:
-            branches:
-              ignore: /.*/
