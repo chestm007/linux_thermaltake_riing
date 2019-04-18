@@ -13,7 +13,6 @@ default_steps: &default_steps
           sudo apt-get install -y libgirepository1.0-dev
           sudo apt-get install -y libcairo2-dev
           python -m venv venv
-          sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
           sudo chmod -R a+rwx /usr/share
           . venv/bin/activate
           pip install .
@@ -23,6 +22,23 @@ default_steps: &default_steps
           . venv/bin/activate
           pip install pytest mock pep8
           python -m pytest
+
+upload_to_pypi: &upload_to_pypi
+  steps:
+    - run:
+        name: init .pypirc
+        command: |
+          echo -e "[pypi]" >> ~/.pypirc
+          echo -e "username = chestm007" >> ~/.pypirc
+          echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+
+    - run:
+        name: package and upload
+        command: |
+          sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
+          python setup.py sdist
+          python setup.py dbist_wheel
+          twine upload dist/*
 
 version: 2
 jobs:
@@ -36,6 +52,11 @@ jobs:
       - image: circleci/python:3.7.3-stretch
     working_directory: ~/repo
     <<: *default_steps
+  deploy:
+    docker:
+      - image: circleci/python:3.7.3-stretch
+    working_directory: ~/repo
+    <<: *upload_to_pypi
 
 workflows:
   version: 2
@@ -43,3 +64,12 @@ workflows:
     jobs:
       - python3.6
       - python3.7
+      - deploy:
+          requires:
+            - python3.6
+            - python3.7
+          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
