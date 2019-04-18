@@ -25,6 +25,7 @@ default_steps: &default_steps
 
 upload_to_pypi: &upload_to_pypi
   steps:
+    - checkout
     - run:
         name: init .pypirc
         command: |
