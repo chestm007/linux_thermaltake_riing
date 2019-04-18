@@ -41,7 +41,6 @@ upload_to_pypi: &upload_to_pypi
           . venv/bin/activate
           sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
           python setup.py sdist
-          python setup.py dbist_wheel
           twine upload dist/*
 
 version: 2
