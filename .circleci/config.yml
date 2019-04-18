@@ -35,6 +35,9 @@ upload_to_pypi: &upload_to_pypi
     - run:
         name: package and upload
         command: |
+          sudo apt-get install -y virtualenv
+          python -m venv venv
+          . venv/bin/activate
           sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
           python setup.py sdist
           python setup.py dbist_wheel
