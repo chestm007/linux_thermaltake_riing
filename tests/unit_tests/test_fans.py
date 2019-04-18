@@ -17,16 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+import unittest
+
 from mock import patch
 
-from base_test_object import BaseTestObject
 from linux_thermaltake_rgb.fan_manager import FanModel, TempTargetModel, CurveModel
 
 TempTargetModel._get_temp = (lambda self: 50)
 CurveModel._get_temp = (lambda self: 50)
 
 
-class FanTest(BaseTestObject):
+class FanTest(unittest.TestCase):
 
     @patch('linux_thermaltake_rgb.drivers.ThermaltakeControllerDriver._initialize_device', autospec=True)
     def test_fan_factory(self, init_dev):

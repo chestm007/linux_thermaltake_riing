@@ -17,18 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-import sys
 
 import logging
+import unittest
 from io import StringIO
 
 from mock import patch
-from base_test_object import BaseTestObject
 from linux_thermaltake_rgb import LOGGER
 from linux_thermaltake_rgb.daemon.daemon import ThermaltakeDaemon, Config
 
 
-class DaemonMockIntegrationTest(BaseTestObject):
+class DaemonMockIntegrationTest(unittest.TestCase):
     def setUp(self):
         self.config_abs_path = str(Config.abs_config_dir)
         Config.abs_config_dir = ''
