@@ -69,7 +69,5 @@ workflows:
             - python3.6
             - python3.7
           filters:
-            tags:
-              only: /[0-9]+(\.[0-9]+)*/
             branches:
               ignore: /.*/
