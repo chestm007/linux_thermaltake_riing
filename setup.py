@@ -19,6 +19,7 @@ setup(
     maintainer_email='chestm007@hotmail.com',
     description='python driver and daemon for thermaltake hardware products',
     long_description=readme,
+    long_description_content_type="text/markdown",
     install_requires=[
         "pyyaml",
         "GObject",
