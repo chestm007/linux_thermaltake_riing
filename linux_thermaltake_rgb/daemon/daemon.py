@@ -18,7 +18,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 import time
-from threading import Thread
 
 from linux_thermaltake_rgb.controllers import ThermaltakeController
 from linux_thermaltake_rgb.fan_manager import FanModel
@@ -55,7 +54,6 @@ class ThermaltakeDaemon:
                 self.controllers[controller['unit']].attach_device(id, dev)
                 self.register_attached_device(controller['unit'], id, dev)
 
-        self._thread = Thread(target=self._main_loop)
         self._continue = False
 
     def register_attached_device(self, unit, port, dev=None):
@@ -70,8 +68,6 @@ class ThermaltakeDaemon:
 
     def run(self):
         self._continue = True
-        LOGGER.debug('starting main thread')
-        self._thread.start()
         LOGGER.debug('starting lighting manager')
         self.lighting_manager.start()
         LOGGER.debug('starting fan manager')
@@ -84,8 +80,6 @@ class ThermaltakeDaemon:
         self.lighting_manager.stop()
         LOGGER.debug('stopping fan manager')
         self.fan_manager.stop()
-        LOGGER.debug('stopping main thread')
-        self._thread.join()
         LOGGER.debug('saving controller profiles')
         for controller in self.controllers.values():
             controller.save_profile()
