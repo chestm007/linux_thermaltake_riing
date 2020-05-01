@@ -45,8 +45,8 @@ class ThermaltakeDevice(ClassifiedObject):
 
 
 class ThermaltakeRGBDevice(ThermaltakeDevice):
-    num_leds = 0
-    index_per_led = 0
+    num_leds = 12
+    index_per_led = 3
 
     def set_lighting(self, values: list = None, mode=0x18, speed=0x00) -> None:
         """
@@ -62,6 +62,40 @@ class ThermaltakeRGBDevice(ThermaltakeDevice):
             data.extend(values)
         LOGGER.debug('{} set lighting: raw hex: {}'.format(self.__class__.__name__, data))
         self.controller.driver.write_out(data)
+
+
+class ThermaltakeTrioDevice(ThermaltakeDevice):
+    num_leds = 12
+    index_per_led = 3
+
+    def set_lighting(self, values: list = None, mode=0x18, speed=0x00) -> None:
+        """
+        for the sake of performance this will assume the data your passing in is correct.
+        if it isnt the worst that will happen (i guess) is the lights wont show up as
+        expected.
+        :param values: [r,g,b...]
+        :param mode: lighting mode(hex)
+        :param speed: light update speed(hex)
+        """
+
+        ## Reading https://github.com/MoshiMoshi0/ttrgbplusapi/blob/master/controllers/riing-trio.md
+        ## It says the data sent to the controller for colors is:
+        ## "For Riing Trio fans the COLORS (30 colors, 3 zones, 12+12+6) list is split in 2 chunks (19+11)"
+        ## "CHUNK_ID indicates the chunk number starting from 1"
+        ## Thus I need to send two lists, the first with 19 numbers, the second with 11.
+        ##                                                                       v Chunk 1
+        first_chunk = [PROTOCOL_SET, PROTOCOL_LIGHT, self.port, mode + speed, 3, 1, 0]
+        ##                                                                        v Chunk 2
+        second_chunk = [PROTOCOL_SET, PROTOCOL_LIGHT, self.port, mode + speed, 3, 2, 0]
+        ## It is worth noting that I am still using the mode as defined in the riing plus, not the riing trio.
+        ## This is probably wrong, but it is very late and I will poke at this after some soonze.
+        ## Also, this actually seems to work.
+        first_chunk.extend(values)
+        second_chunk.extend(values)
+        LOGGER.debug('{} set lighting: raw hex: {}'.format(self.__class__.__name__, first_chunk))
+        self.controller.driver.write_out(first_chunk)
+        LOGGER.debug('{} set lighting: raw hex: {}'.format(self.__class__.__name__, second_chunk))
+        self.controller.driver.write_out(second_chunk)
 
 
 class ThermaltakeFanDevice(ThermaltakeDevice):

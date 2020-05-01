@@ -114,3 +114,75 @@ lighting_manager:
 #  g: 0
 #  b: 0
 
+
+## The configuration used for my Riing Trio 20
+## In order to modify the lights on my recently purchased (2020-03-10)
+## Riing Trio 20 fan, I made some changes to linux_thermaltake_rgb.
+## These changes came out of my reading of:
+##   https://github.com/MoshiMoshi0/ttrgbplusapi/blob/master/controllers/riing-trio.md
+##  and
+##   https://github.com/MoshiMoshi0/ttrgbplusapi/blob/master/controllers/riing-plus.md
+## It is worth noting that the code in linux_thermaltake_rgb seems to
+## assume that all devices are of the latter variety and not the
+## former.  The primary difference between the two lies in the fact
+## that the trio expects 3 more elements in the list of bytes sent and
+## expects the lists to be sent in multiple chunks.  (At least that is
+## my interpretation, but I think there is room for doubt in my
+## reading).  Here is the relevant text from the riing-trio:
+##
+##  "Sets rgb on PORT to COLORS For Riing Trio fans the COLORS (30
+##  colors, 3 zones, 12+12+6) list is split in 2 chunks (19+11)"
+##
+## In contrast, the same portion of text for the riing-plus is a
+## single value.
+##
+## I therefore made a new device in devices/__init__.py and fans.py
+## named 'ThermaltakeTrioDevice' with the configuration name 'riing
+## trio' and added my interpretation of the text's extra chunks.
+##
+## Here is my corresponding configuration stanza along with some
+## comments describing what I did/have.
+##
+## I plugged my fan into blocks 1 and 2 of the RGB-plus controller as
+## per the little picture in the manual.  I was not certain if I
+## should therefore have devices 1 and 2 filled in, but just device 1 works.
+## controllers:
+##  - unit: 1
+##    type: riingtrio
+##    devices:
+##      1: Riing Trio   ## Note my fan name is 'Riing Trio'
+##
+## lighting_manager:
+##   model: 'temperature'
+##   sensor_name: 'coretemp'
+##   cold: 30
+##   target: 40
+##   hot: 60
+##   speed: 'slow'
+##
+## fan_manager:
+##   model: 'curve'
+##   points:
+##     - [0, 0]
+##     - [50, 50]
+##     - [70, 100]
+##   sensor_name: 'coretemp'
+
+##
+## ## Everything except the device name is copy/pasted from the config.yml
+## ## Except the sensor_name which I acquired by running sensors
+## ## Here is the output when I run sensors (note I chose 'coretemp'
+## ## insead of 'acpitz' which is also valid):
+## ##
+## ##  acpitz-acpi-0
+## ##  Adapter: ACPI interface
+## ##  temp1:        +27.8°C  (crit = +106.0°C)
+## ##  temp2:        +29.8°C  (crit = +106.0°C)
+## ##
+## ##  coretemp-isa-0000
+## ##  Adapter: ISA adapter
+## ##  Package id 0:  +28.0°C  (high = +85.0°C, crit = +105.0°C)
+## ##  Core 0:        +26.0°C  (high = +85.0°C, crit = +105.0°C)
+## ##  Core 1:        +27.0°C  (high = +85.0°C, crit = +105.0°C)
+## ##  Core 2:        +23.0°C  (high = +85.0°C, crit = +105.0°C)
+## ##  Core 3:        +29.0°C  (high = +85.0°C, crit = +105.0°C)
