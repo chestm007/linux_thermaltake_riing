@@ -69,6 +69,9 @@ class ThermaltakeDaemon:
         if self.lighting_manager and isinstance(dev, devices.ThermaltakeRGBDevice):
             LOGGER.debug('  registering %s with lighting manager', dev.model)
             self.lighting_manager.attach_device(dev)
+        if isinstance(dev, devices.ThermaltakeTrioDevice):
+            LOGGER.debug('  registering %s with trio lighting manager', dev.model)
+            self.lighting_manager.attach_device(dev)
 
         self.attached_devices[f'{unit}:{port}'] = dev
 

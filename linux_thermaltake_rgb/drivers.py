@@ -37,8 +37,8 @@ class ThermaltakeControllerDriver:
         raise NotImplementedError
 
     def _initialize_device(self):
-        self.device = usb.core.find(idVendor=self.vendor_id,
-                                    idProduct=self.product_id)
+        self.device = usb.core.find(idVendor = self.vendor_id,
+                                    idProduct = self.product_id)
         # fail safe incase last device usage was dirty
         self.device.reset()
 
@@ -63,15 +63,17 @@ class ThermaltakeControllerDriver:
             raise e
 
         self.cfg = self.device.get_active_configuration()
+        LOGGER.debug('Configuration of usb device: {}'.format(self.cfg))
         self.interface = self.cfg[(0, 0)]
         self.endpoint_out = usb.util.find_descriptor(
             self.interface,
-            custom_match=lambda e: usb.util.endpoint_direction(e.bEndpointAddress) == usb.util.ENDPOINT_OUT)
+            custom_match = lambda e: usb.util.endpoint_direction(e.bEndpointAddress) == usb.util.ENDPOINT_OUT)
+        LOGGER.debug('endpoint_out is {}'.format(self.endpoint_out))
         assert self.endpoint_out is not None
 
         self.endpoint_in = usb.util.find_descriptor(
             self.interface,
-            custom_match=lambda e: usb.util.endpoint_direction(e.bEndpointAddress) == usb.util.ENDPOINT_IN)
+            custom_match = lambda e: usb.util.endpoint_direction(e.bEndpointAddress) == usb.util.ENDPOINT_IN)
         assert self.endpoint_in is not None
 
         # initialize/reset the device
@@ -98,11 +100,16 @@ class ThermaltakeControllerDriver:
         )
         return array
 
-    def write_out(self, data: list, length: int = 64) -> None:
+    ##def write_out(self, data: list, length: int = 64) -> None:
+    def write_out(self, data: list, length: int = 64) -> list:
+        output = list(data)
         try:
-            self.endpoint_out.write(self._populate_partial_data_array(data, length))
+            ##output = self.endpoint_out.write(self._populate_partial_data_array(data, length))
+            output = self.endpoint_out.write(self._populate_partial_data_array(data, length))
+            LOGGER.debug('write_out returned: {}'.format(output))
+            return output
         except OverflowError:
-            return
+            return output
 
     def read_out(self, length: int = 64) -> bytearray:
         return self.endpoint_out.read(length)
