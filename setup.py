@@ -22,7 +22,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         "pyyaml",
-        "GObject",
+        "PyGObject",
         "psutil",
         "pyusb",
         "numpy"
