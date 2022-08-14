@@ -35,12 +35,18 @@ class ThermaltakeDaemon:
         LOGGER.debug('loading config')
         self.config = Config()
 
-        LOGGER.debug('creating fan manager')
-        fan_model = FanModel.factory(self.config.fan_manager)
-        self.fan_manager = FanManager(fan_model)
+        if self.config.fan_manager:
+            LOGGER.debug('creating fan manager')
+            fan_model = FanModel.factory(self.config.fan_manager)
+            self.fan_manager = FanManager(fan_model)
+        else:
+            self.fan_manager = None
 
-        LOGGER.debug('creating lighting manager')
-        self.lighting_manager = LightingEffect.factory(self.config.lighting_manager)
+        if self.config.lighting_manager:
+            LOGGER.debug('creating lighting manager')
+            self.lighting_manager = LightingEffect.factory(self.config.lighting_manager)
+        else:
+            self.lighting_manager = None
 
         self.attached_devices = {}
         self.controllers = {}
@@ -57,10 +63,10 @@ class ThermaltakeDaemon:
         self._continue = False
 
     def register_attached_device(self, unit, port, dev=None):
-        if isinstance(dev, devices.ThermaltakeFanDevice):
+        if self.fan_manager and isinstance(dev, devices.ThermaltakeFanDevice):
             LOGGER.debug('  registering %s with fan manager', dev.model)
             self.fan_manager.attach_device(dev)
-        if isinstance(dev, devices.ThermaltakeRGBDevice):
+        if self.lighting_manager and isinstance(dev, devices.ThermaltakeRGBDevice):
             LOGGER.debug('  registering %s with lighting manager', dev.model)
             self.lighting_manager.attach_device(dev)
 
@@ -68,18 +74,22 @@ class ThermaltakeDaemon:
 
     def run(self):
         self._continue = True
-        LOGGER.debug('starting lighting manager')
-        self.lighting_manager.start()
-        LOGGER.debug('starting fan manager')
-        self.fan_manager.start()
+        if self.lighting_manager:
+            LOGGER.debug('starting lighting manager')
+            self.lighting_manager.start()
+        if self.fan_manager:
+            LOGGER.debug('starting fan manager')
+            self.fan_manager.start()
 
     def stop(self):
         LOGGER.debug('recieved exit command')
         self._continue = False
-        LOGGER.debug('stopping lighting manager')
-        self.lighting_manager.stop()
-        LOGGER.debug('stopping fan manager')
-        self.fan_manager.stop()
+        if self.lighting_manager:
+            LOGGER.debug('stopping lighting manager')
+            self.lighting_manager.stop()
+        if self.fan_manager:
+            LOGGER.debug('stopping fan manager')
+            self.fan_manager.stop()
         LOGGER.debug('saving controller profiles')
         for controller in self.controllers.values():
             controller.save_profile()
