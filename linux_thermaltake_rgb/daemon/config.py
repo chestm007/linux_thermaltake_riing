@@ -58,7 +58,7 @@ class Config:
 
         cfg = ''.join(cfg_lines)
         LOGGER.debug('raw config file\n** start **\n\n%s\n** end **\n', cfg)
-        return yaml.load(cfg, Loader=yaml.FullLoader)
+        return yaml.safe_load(cfg)
 
     def parse_config(self, config):
             self.controllers = config.get('controllers')
